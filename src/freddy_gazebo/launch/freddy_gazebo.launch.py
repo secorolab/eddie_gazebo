@@ -18,11 +18,25 @@ from launch_ros.substitutions import FindPackageShare
 
 # Function to select and load the appropriate controllers based on the given context and launch arguments
 def select_controller(context, *args, **kwargs):
+    """
+    Selects the appropriate controllers based on the declared controller types.
 
-    # Retrieve the declared base and arm controllers from the launch configuration
+    Args:
+        context: The ROS2 launch configuration context.
+        *args: Any additional arguments.
+        **kwargs: Any additional keyword arguments.
+
+    Returns:
+        list: A list of controllers to be loaded.
+
+    Raises:
+        ValueError: If an unsupported controller type is specified.
+    """
+    # Retrieve the declared base controller and arm controller types from the ROS2 launch configuration
     declared_base_controller = LaunchConfiguration('base_controller').perform(context)
     declared_arm_controller = LaunchConfiguration('arm_controller').perform(context)
 
+    # Load and activate the arm effort controllers
     load_arm_left_effort_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
              'arm_left_effort_controller'],
@@ -35,6 +49,7 @@ def select_controller(context, *args, **kwargs):
         output='screen'
     )
 
+    # Load and activate the arm joint trajectory controllers
     load_joint_trajectory_controller_left = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'arm_left_joint_trajectory_controller'],
@@ -46,6 +61,7 @@ def select_controller(context, *args, **kwargs):
         output='both'
     )
 
+    # Load and activate the base controllers
     load_joint_position_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
              'base_position_controller'],
@@ -64,19 +80,23 @@ def select_controller(context, *args, **kwargs):
         output='screen'
     )
  
+    # Define a dictionary to map the declared base controller type to its corresponding controllers
     base_controller_map = {
         "position": load_joint_position_controller,
         "velocity": load_joint_velocity_controller,
         "effort": load_joint_effort_controller,
     }
+    # Define a dictionary to map the declared arm controller type to its corresponding controllers
     arm_controller_map = {
         "effort": [load_arm_right_effort_controller, load_arm_left_effort_controller],
         "joint_trajectory": [load_joint_trajectory_controller_left, load_joint_trajectory_controller_right]
     }
-
-    # Validate that the declared controllers exist in the maps, otherwise raise an error
-    if declared_base_controller not in base_controller_map or declared_arm_controller not in arm_controller_map:
-        raise ValueError(f"Unsupported base_controller_type: {declared_base_controller}")
+    
+    # Check if the declared base and arm controllers are supported
+    if declared_base_controller not in base_controller_map:
+        raise ValueError(f"Unsupported base_controller type: {declared_base_controller}")
+    elif declared_arm_controller not in arm_controller_map:
+        raise ValueError(f"Unsupported arm_controller type: {declared_arm_controller}")
     else: 
         # Return the selected base and arm controllers for execution
         return [base_controller_map[declared_base_controller], *arm_controller_map[declared_arm_controller]]
