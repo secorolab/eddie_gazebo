@@ -94,9 +94,9 @@ def select_controller(context, *args, **kwargs):
     
     # Check if the declared base and arm controllers are supported
     if declared_base_controller not in base_controller_map:
-        raise ValueError(f"Unsupported base_controller type: {declared_base_controller}")
+        raise ValueError(f"Undefined base_controller: {declared_base_controller}")
     elif declared_arm_controller not in arm_controller_map:
-        raise ValueError(f"Unsupported arm_controller type: {declared_arm_controller}")
+        raise ValueError(f"Undefined arm_controller: {declared_arm_controller}")
     else: 
         # Return the selected base and arm controllers for execution
         return [base_controller_map[declared_base_controller], *arm_controller_map[declared_arm_controller]]

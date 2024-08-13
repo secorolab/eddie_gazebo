@@ -18,6 +18,30 @@ class FreddyGazeboPublisher(Node):
     def __init__(self, ) -> None:
         super().__init__('FreddyGazeboPublisher')
 
+        # Declare controller parameters
+        self.declare_parameter('arm_controller', 'joint_trajectory')
+        self.declare_parameter('base_controller', 'velocity')
+
+        valid_controllers = {
+            'arm': ['joint_trajectory', 'effort'],
+            'base': ['position', 'velocity', 'effort']
+        }
+
+        # Getting declared parameters
+        self.arm_controller: str = self.get_parameter('arm_controller').get_parameter_value().string_value
+        assert self.arm_controller in valid_controllers['arm'], f'Undefined arm_controller: {self.arm_controller}'
+
+        self.base_controller: str = self.get_parameter('base_controller').get_parameter_value().string_value
+        assert self.base_controller in valid_controllers['base'], f'Undefined base_controller: {self.base_controller}'
+
+        arm_controller_name = \
+            {side: f'arm_{side}_joint_trajectory_controller' if self.arm_controller == 'joint_trajectory' \
+                else f'arm_{side}_effort_controller' for side in ['left', 'right']}
+        base_controller_name = f'base_{self.base_controller}_controller'
+
+        self.get_logger().info(f"Setting up command for arm controller: {arm_controller_name}")
+        self.get_logger().info(f"Setting up command for base controller: {base_controller_name}")
+
         with open('install/freddy_gazebo/share/freddy_gazebo/config/freddy_controller.yaml') \
                 as param_file:
             controller_params = yaml.safe_load(param_file)
@@ -25,26 +49,34 @@ class FreddyGazeboPublisher(Node):
         self.components = {
             "arm_left": {
                 "publisher": self.create_publisher(
-                    JointTrajectory, 
-                    '/arm_left_joint_trajectory_controller/joint_trajectory', 
+                    JointTrajectory if self.arm_controller == 'joint_trajectory' \
+                        else Float64MultiArray, 
+                    f'/{arm_controller_name["left"]}/' + \
+                        ('joint_trajectory' if self.arm_controller == 'joint_trajectory' \
+                            else 'commands'), 
                     10,
                     ),
                 "state": np.zeros(7),
-                "message": JointTrajectory(),
-                "joints": controller_params["arm_left_joint_trajectory_controller"]\
+                "message": JointTrajectory() if self.arm_controller == 'joint_trajectory' \
+                    else Float64MultiArray(),
+                "joints": controller_params[arm_controller_name["left"]]\
                     ["ros__parameters"]["joints"],
                 "frame_id": "base_link",
                 "trajectory_duration": 1,
             },
             "arm_right": {
                 "publisher": self.create_publisher(
-                    JointTrajectory, 
-                    '/arm_right_joint_trajectory_controller/joint_trajectory', 
+                    JointTrajectory if self.arm_controller == 'joint_trajectory' \
+                        else Float64MultiArray, 
+                    f'/{arm_controller_name["right"]}/' + \
+                        ('joint_trajectory' if self.arm_controller == 'joint_trajectory' \
+                            else 'commands'), 
                     10,
                     ),
                 "state": np.zeros(7),
-                "message": JointTrajectory(),
-                "joints": controller_params["arm_right_joint_trajectory_controller"]\
+                "message": JointTrajectory() if self.arm_controller == 'joint_trajectory' \
+                    else Float64MultiArray(),
+                "joints": controller_params[arm_controller_name["right"]]\
                     ["ros__parameters"]["joints"],
                 "frame_id": "base_link",
                 "trajectory_duration": 1,
@@ -52,7 +84,7 @@ class FreddyGazeboPublisher(Node):
             "base": {
                 "publisher": self.create_publisher(
                     Float64MultiArray, 
-                    '/base_velocity_controller/commands', 
+                    f'/{base_controller_name}/commands', 
                     10,
                     ),
                 "state": np.zeros(8),
@@ -78,6 +110,7 @@ class FreddyGazeboPublisher(Node):
 
     def update_state(self, component_name: str, increment: np.ndarray, ) -> None:
         # Since commands are of variable length, only take the required number of elements
+        print(f"Currently controlling {component_name}")
         self.components[component_name]["state"] += \
             increment[:len(self.components[component_name]["state"])]
 
@@ -89,24 +122,29 @@ class FreddyGazeboPublisher(Node):
     def update_messages(self, ) -> None:
         for component_name in self.components:
             if "arm" in component_name:
-                msg = JointTrajectory()
-                msg.header = Header()
-                msg.header.frame_id = self.components[component_name]["frame_id"] 
-                msg.joint_names = self.components[component_name]["joints"]
-                # print(msg.joint_names)
+                if self.arm_controller == 'joint_trajectory':
+                    msg = JointTrajectory()
+                    msg.header = Header()
+                    msg.header.frame_id = self.components[component_name]["frame_id"] 
+                    msg.joint_names = self.components[component_name]["joints"]
 
-                trajectory_point = JointTrajectoryPoint()
-                trajectory_point.positions = \
-                    self.components[component_name]["state"].tolist()
-                trajectory_point._time_from_start = \
-                    Duration(
-                        sec=self.components[component_name]["trajectory_duration"], 
-                        nanosec=0,
-                        )
+                    trajectory_point = JointTrajectoryPoint()
+                    trajectory_point.positions = \
+                        self.components[component_name]["state"].tolist()
+                    trajectory_point._time_from_start = \
+                        Duration(
+                            sec=self.components[component_name]["trajectory_duration"], 
+                            nanosec=0,
+                            )
 
-                msg.points.append(trajectory_point)
-                self.components[component_name]["message"] = msg
-                # print(self.components[component_name]["message"])
+                    msg.points.append(trajectory_point)
+                    self.components[component_name]["message"] = msg
+
+                else:
+                    msg = Float64MultiArray()
+                    msg.data = self.components[component_name]["state"].tolist()
+
+                    self.components[component_name]["message"] = msg
 
             elif component_name == "base":
                 msg = Float64MultiArray()
