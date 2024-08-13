@@ -18,6 +18,30 @@ from launch_ros.substitutions import FindPackageShare
 
 def select_controller(context, *args, **kwargs):
     declared_base_controller = LaunchConfiguration('base_controller').perform(context)
+    declared_arm_controller = LaunchConfiguration('arm_controller').perform(context)
+
+    load_arm_left_effort_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
+             'arm_left_effort_controller'],
+        output='screen'
+    )
+
+    load_arm_right_effort_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
+             'arm_right_effort_controller'],
+        output='screen'
+    )
+
+    load_joint_trajectory_controller_left = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'arm_left_joint_trajectory_controller'],
+        output='both'
+    )
+    load_joint_trajectory_controller_right = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'arm_right_joint_trajectory_controller'],
+        output='both'
+    )
 
     load_joint_position_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
@@ -36,16 +60,21 @@ def select_controller(context, *args, **kwargs):
              'base_effort_controller'],
         output='screen'
     )
-
+ 
     base_controller_map = {
         "position": load_joint_position_controller,
         "velocity": load_joint_velocity_controller,
         "effort": load_joint_effort_controller,
     }
-    if declared_base_controller not in base_controller_map:
+    arm_controller_map = {
+        "effort": [load_arm_right_effort_controller, load_arm_left_effort_controller],
+        "joint_trajectory": [load_joint_trajectory_controller_left, load_joint_trajectory_controller_right]
+    }
+
+    if declared_base_controller not in base_controller_map or declared_arm_controller not in arm_controller_map:
         raise ValueError(f"Unsupported base_controller_type: {declared_base_controller}")
     else: 
-        return [base_controller_map[declared_base_controller]]
+        return [base_controller_map[declared_base_controller], *arm_controller_map[declared_arm_controller]]
 
 def generate_launch_description():
     # Package directories
@@ -56,6 +85,13 @@ def generate_launch_description():
         default_value='velocity',
         description='Specify controller for base (position, velocity, effort) (default: velocity)'
     )
+
+    declare_arm_controller_type = DeclareLaunchArgument(
+        'arm_controller',
+        default_value='joint_trajectory',
+        description='Specify controller for arm (joint_trajectory, effort) (default: joint_trajectory)'
+    )
+
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
     pkg_freddy_gazebo = get_package_share_directory('freddy_gazebo')
     pkg_freddy_description = get_package_share_directory('freddy_description')
@@ -96,17 +132,6 @@ def generate_launch_description():
         output='screen'
     )
     
-  
-    load_joint_trajectory_controller_left = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'arm_left_joint_trajectory_controller'],
-        output='both'
-    )
-    load_joint_trajectory_controller_right = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'arm_right_joint_trajectory_controller'],
-        output='both'
-    )
  
     # Gazebo simulation
     gz_sim = IncludeLaunchDescription(
@@ -134,6 +159,7 @@ def generate_launch_description():
     return LaunchDescription([
         set_env_vars_resources,
         declare_base_controller_type,
+        declare_arm_controller_type,
          # Launch gazebo environment
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
@@ -155,8 +181,10 @@ def generate_launch_description():
             )
         ),
         # Launch controller for arms
-        load_joint_trajectory_controller_left,
-        load_joint_trajectory_controller_right,
+        # load_joint_trajectory_controller_left,
+        # load_joint_trajectory_controller_right,
+        # load_arm_left_effort_controller,
+        # load_arm_right_effort_controller,
         node_robot_state_publisher,
         gz_spawn_entity,
 
