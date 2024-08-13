@@ -18,19 +18,6 @@ def generate_launch_description():
     pkg_freddy_description = get_package_share_directory('freddy_description')
     pkg_kortex_description = get_package_share_directory('kortex_description')
 
-    # Resource paths
-    # resource_paths = [
-    #     pkg_freddy_description,
-    #     os.path.join(pkg_freddy_description, 'freddy_base_description', 'meshes'),
-    #     os.path.join(pkg_freddy_description, 'freddy_base_description', 'meshes', 'sensors'),
-    #     os.path.join(pkg_freddy_description, 'freddy_torso_description', 'meshes'),
-    # ]
-    # resource_paths_str = os.pathsep.join(resource_paths)
-    # set_env_vars_resources = AppendEnvironmentVariable(
-    #     name='GZ_SIM_RESOURCE_PATH',
-    #     value=resource_paths_str,
-    # )
-
     # World and robot files
     world_file = os.path.join(pkg_freddy_gazebo, 'worlds', 'my_world.sdf')
     xacro_file = os.path.join(pkg_freddy_description,

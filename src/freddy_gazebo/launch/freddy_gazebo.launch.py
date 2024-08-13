@@ -16,7 +16,10 @@ from launch_ros.descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
+# Function to select and load the appropriate controllers based on the given context and launch arguments
 def select_controller(context, *args, **kwargs):
+
+    # Retrieve the declared base and arm controllers from the launch configuration
     declared_base_controller = LaunchConfiguration('base_controller').perform(context)
     declared_arm_controller = LaunchConfiguration('arm_controller').perform(context)
 
@@ -71,10 +74,13 @@ def select_controller(context, *args, **kwargs):
         "joint_trajectory": [load_joint_trajectory_controller_left, load_joint_trajectory_controller_right]
     }
 
+    # Validate that the declared controllers exist in the maps, otherwise raise an error
     if declared_base_controller not in base_controller_map or declared_arm_controller not in arm_controller_map:
         raise ValueError(f"Unsupported base_controller_type: {declared_base_controller}")
     else: 
+        # Return the selected base and arm controllers for execution
         return [base_controller_map[declared_base_controller], *arm_controller_map[declared_arm_controller]]
+
 
 def generate_launch_description():
     # Package directories
@@ -158,8 +164,11 @@ def generate_launch_description():
 
     return LaunchDescription([
         set_env_vars_resources,
+
+        # Declare and set base and arm controllers through launch arguments
         declare_base_controller_type,
         declare_arm_controller_type,
+
          # Launch gazebo environment
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
@@ -173,18 +182,14 @@ def generate_launch_description():
                 on_exit=[load_joint_state_broadcaster],
             )
         ),
-        # Launch controller
+
+        # Load selected controllers or defualt controllers
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=load_joint_state_broadcaster,
                 on_exit=[OpaqueFunction(function=select_controller)],
             )
         ),
-        # Launch controller for arms
-        # load_joint_trajectory_controller_left,
-        # load_joint_trajectory_controller_right,
-        # load_arm_left_effort_controller,
-        # load_arm_right_effort_controller,
         node_robot_state_publisher,
         gz_spawn_entity,
 
