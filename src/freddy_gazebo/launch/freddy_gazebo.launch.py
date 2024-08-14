@@ -103,26 +103,37 @@ def select_controller(context, *args, **kwargs):
 
 
 def generate_launch_description():
-    # Package directories
+    """Generates the launch description for the Freddy robot simulation.
+
+    This function sets up the environment variables, declares the base and arm controllers,
+    launches the Gazebo simulation, loads the selected controllers or default controllers,
+    and starts the robot state publisher.
+    
+    Returns:
+        LaunchDescription: The launch description for the Freddy robot simulation.
+    """
+    # Configuration to use simulation time (use by default)
     use_sim_time = LaunchConfiguration('use_sim_time', default=True)
 
+    # Declare the base controller argument with a default value of "velocity"
     declare_base_controller_type = DeclareLaunchArgument(
         'base_controller',
         default_value='velocity',
         description='Specify controller for base (position, velocity, effort) (default: velocity)'
     )
 
+    # Declare the arm controller argument with a default value of "joint_trajectory"
     declare_arm_controller_type = DeclareLaunchArgument(
         'arm_controller',
         default_value='joint_trajectory',
         description='Specify controller for arm (joint_trajectory, effort) (default: joint_trajectory)'
     )
 
-    pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+    # Get package directories
     pkg_freddy_gazebo = get_package_share_directory('freddy_gazebo')
     pkg_freddy_description = get_package_share_directory('freddy_description')
 
-    # Resource paths
+    # Resource paths to be added to the GZ_SIM_RESOURCE_PATH environment variable
     resource_paths = [
         pkg_freddy_description,
         os.path.join(pkg_freddy_description, 'freddy_base_description', 'meshes'),
@@ -130,6 +141,8 @@ def generate_launch_description():
         os.path.join(pkg_freddy_description, 'freddy_torso_description', 'meshes'),
     ]
     resource_paths_str = os.pathsep.join(resource_paths)
+
+    # Set the environment variable GZ_SIM_RESOURCE_PATH to include the resource paths
     set_env_vars_resources = AppendEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
         value=resource_paths_str,
@@ -148,24 +161,16 @@ def generate_launch_description():
             ),
         ]
     )
-   
-    robot_description_params = {'robot_description': robot_description_content}
-
-  
+    
+    # Load the joint state broadcaster controller on robot spawn -- see function return
     load_joint_state_broadcaster = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'joint_state_broadcaster'],
         output='screen'
     )
-    
- 
-    # Gazebo simulation
-    gz_sim = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
-        ),
-        launch_arguments={'gz_args': ['-r -v4 ', world_file,]}.items(),
-    )
+
+    # Parameters for the robot state publisher
+    robot_description_params = {'robot_description': robot_description_content}
 
     # Robot state publisher
     node_robot_state_publisher = Node(
@@ -189,7 +194,7 @@ def generate_launch_description():
         declare_base_controller_type,
         declare_arm_controller_type,
 
-         # Launch gazebo environment
+        # Launch gazebo environment
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 [PathJoinSubstitution([FindPackageShare('ros_gz_sim'),
@@ -203,7 +208,7 @@ def generate_launch_description():
             )
         ),
 
-        # Load selected controllers or defualt controllers
+        # Load selected controllers or default controllers
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=load_joint_state_broadcaster,
