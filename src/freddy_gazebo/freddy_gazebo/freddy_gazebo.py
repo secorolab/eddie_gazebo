@@ -165,8 +165,9 @@ class FreddyGazeboPublisher(Node):
                 self.components[component_name]["message"] = msg
 
         clear_line()
-        print(f"Updated state of {current_component} to: ", \
-              self.components[current_component]["state"])
+        with np.printoptions(suppress=True):
+            print(f"Updated state of {current_component} to: ", \
+                  np.array(self.components[current_component]["state"]))
 
         return None
 
@@ -222,7 +223,7 @@ class KeyboardPress():
         '\n',
         'Increment state using     w   e   r   t   y   u   i   o\n',
         '                          ↑   ↑   ↑   ↑   ↑   ↑   ↑   ↑\n',
-        '                Joint     0   1   2   3   4   5   6   7\n',
+        '                Joint     1   2   3   4   5   6   7   8\n',
         '                          ↓   ↓   ↓   ↓   ↓   ↓   ↓   ↓\n',
         'Decrement state using     s   d   f   g   h   j   k   l\n',
         '\n',
@@ -232,9 +233,9 @@ class KeyboardPress():
         'Decrement state decrement step using    -\n',
         '\n',
         'Choose robot component to command using\n',
-        '                                        q → arm_left\n'
-        '                                        a → arm_right\n'
-        '                                        z → base\n'
+        '                                        q : arm_left\n'
+        '                                        a : arm_right\n'
+        '                                        z : base\n'
         '\n'
         ])
         print(self.intro_message)
