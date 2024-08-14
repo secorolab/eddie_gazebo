@@ -52,6 +52,27 @@ Choose robot component to command using
                                         z : base
 ```
 
+### Switching the Controllers
+The default controllers are loaded automatically, and additional controllers can be loaded using ROS arguments as mentioned above. Alternatively, you can use rqt_controller_manager to switch controllers without restarting the simulation. To switch controllers, first unload the current controller through the UI, then load the desired one, please follow these steps to make sure the correct hardware interfaces are "claimed" and commands run smoothly.
+
+To download rqt_controller_manager, use the following command:
+```bash
+pip install rqt_controller_manager
+```
+To run the controller_manager UI, use the following command:
+```bash
+ros2 run rqt_controller_manager rqt_controller_manager --force-discover
+```
+In the UI, if controller_manager is not already selected, choose it from the dropdown menu.
+![Select the namespace(controller_manager)](/doc/images/namespace.png)
+
+To unload a controller, right-click on the desired controller and select "De-activate and Unload".
+![Unload the controller for left arm/right arm/base](/doc/images/unload.png)
+
+To load the desired controller, right-click on it and select "Load, Configure and activate'.
+
+![Load the controller for left arm/right arm/base](/doc/images/load.png)
+
 ### References
 
 - https://automaticaddison.com/how-to-control-a-robotic-arm-using-ros-2-control-and-gazebo/#Gazebo_new_version
