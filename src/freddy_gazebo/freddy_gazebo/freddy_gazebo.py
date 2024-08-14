@@ -26,8 +26,25 @@ def clear_line(n=1):
 
 
 class FreddyGazeboPublisher(Node):
+    """
+    This class is responsible for publishing commands to the robot's components.
+    
+    It loads configuration from YAML files, sets up publishers and subscribers,
+    and updates the state of each component based on incoming commands.
+    
+    Parameters:
+    verbose (bool): Whether to print debug messages or not
+    """
+
+    
     def __init__(self, 
                  verbose=False) -> None:
+        """
+        Initializes the FreddyGazeboPublisher instance
+        
+        Args:
+            verbose (bool): Whether to print debug messages or not
+        """
         super().__init__('FreddyGazeboPublisher')
         self.verbose = verbose
 
@@ -122,6 +139,13 @@ class FreddyGazeboPublisher(Node):
 
 
     def update_state(self, component_name: str, increment: np.ndarray, ) -> None:
+        """
+        Updates the state of a given component
+        
+        Args:
+            component_name (str): Name of the component to update
+            increment (np.ndarray): Increment to apply to the component's state
+        """
         # Since commands are of variable length, only take the required number of elements
         self.components[component_name]["state"] += \
             increment[:len(self.components[component_name]["state"])]
@@ -132,6 +156,12 @@ class FreddyGazeboPublisher(Node):
 
 
     def update_messages(self, current_component=None) -> None:
+        """
+        Updates the messages for all components
+        
+        Args:
+            current_component (str): Optional name of the component for printing
+        """
         for component_name in self.components:
             if "arm" in component_name:
                 if self.arm_controller == 'joint_trajectory':
@@ -166,13 +196,20 @@ class FreddyGazeboPublisher(Node):
 
         clear_line()
         with np.printoptions(suppress=True):
-            print(f"Updated state of {current_component} to: ", \
-                  np.array(self.components[current_component]["state"]))
+            if current_component is not None:
+                print(f"Updated state of {current_component} to: ", \
+                      np.array(self.components[current_component]["state"]))
+            else:
+                print(f"Updated states to: ", \
+                      [np.array(self.components[component]["state"]) for component in self.components])
 
         return None
 
 
     def publish_commands(self, ) -> None:
+        """
+        Publishes commands for all components
+        """
         for component_name in self.components:
             # print(self.components[component_name]["message"])
             self.components[component_name]["publisher"].publish(
