@@ -14,9 +14,22 @@ from std_msgs.msg import Float64MultiArray, Header
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 
+def clear_line(n=1):
+    '''
+    Function for carriaged printing from 
+    https://itnext.io/overwrite-previously-printed-lines-4218a9563527
+    '''
+    LINE_UP = '\033[1A'
+    LINE_CLEAR = '\x1b[2K'
+    for i in range(n):
+        print(LINE_UP, end=LINE_CLEAR)
+
+
 class FreddyGazeboPublisher(Node):
-    def __init__(self, ) -> None:
+    def __init__(self, 
+                 verbose=False) -> None:
         super().__init__('FreddyGazeboPublisher')
+        self.verbose = verbose
 
         # Declare controller parameters
         self.declare_parameter('arm_controller', 'joint_trajectory')
@@ -39,8 +52,8 @@ class FreddyGazeboPublisher(Node):
                 else f'arm_{side}_effort_controller' for side in ['left', 'right']}
         base_controller_name = f'base_{self.base_controller}_controller'
 
-        self.get_logger().info(f"Setting up command for arm controller: {arm_controller_name}")
-        self.get_logger().info(f"Setting up command for base controller: {base_controller_name}")
+        self.get_logger().info(f"Setting up command interface for selected arm controller: {arm_controller_name}")
+        self.get_logger().info(f"Setting up command interface for selected base controller: {base_controller_name}")
 
         with open('install/freddy_gazebo/share/freddy_gazebo/config/freddy_controller.yaml') \
                 as param_file:
@@ -103,23 +116,22 @@ class FreddyGazeboPublisher(Node):
                         [initial_positions[f"joint_{index}"] for index in range(1, 8)]
                         )
 
-
-        print("Loaded keyboard control interface with the following components:")
-        pprint(self.components)
+        if self.verbose:
+            self.get_logger().info("Loaded keyboard control interface with the following components:")
+            pprint(self.components)
 
 
     def update_state(self, component_name: str, increment: np.ndarray, ) -> None:
         # Since commands are of variable length, only take the required number of elements
-        print(f"Currently controlling {component_name}")
         self.components[component_name]["state"] += \
             increment[:len(self.components[component_name]["state"])]
 
-        self.update_messages()
+        self.update_messages(component_name)
 
         return None
 
 
-    def update_messages(self, ) -> None:
+    def update_messages(self, current_component=None) -> None:
         for component_name in self.components:
             if "arm" in component_name:
                 if self.arm_controller == 'joint_trajectory':
@@ -152,8 +164,9 @@ class FreddyGazeboPublisher(Node):
 
                 self.components[component_name]["message"] = msg
 
-        print(f"Updated states to: ", *[self.components[component_name]["state"] \
-                                        for component_name in self.components])
+        clear_line()
+        print(f"Updated state of {current_component} to: ", \
+              self.components[current_component]["state"])
 
         return None
 
@@ -192,16 +205,39 @@ class KeyboardPress():
             'l': (0, 0, 0, 0, 0, 0, 0, -1),
         }
         self.speed_bindings={
-                '+': (1.03, 1.1),
-                '-': (.6, .9)
+                '+': (1.05, 1.1),
+                '-': (.95, .9)
         }
         self.component_bindings={
             'q': 'arm_left', # Left arm
             'a': 'arm_right', # Right arm
             'z': 'base' # Base 
         }
+        self.default_speed = 0.1
         self.speed = 0.1
 
+        self.intro_message = ''.join([
+        '\n',
+        'Keyboard interface for commanding the Freddy robot in simulation\n',
+        '\n',
+        'Increment state using     w   e   r   t   y   u   i   o\n',
+        '                          ↑   ↑   ↑   ↑   ↑   ↑   ↑   ↑\n',
+        '                Joint     0   1   2   3   4   5   6   7\n',
+        '                          ↓   ↓   ↓   ↓   ↓   ↓   ↓   ↓\n',
+        'Decrement state using     s   d   f   g   h   j   k   l\n',
+        '\n',
+        'Increment state increment step using    +\n',
+        '                                        ↑\n',
+        '                                        ↓\n',
+        'Decrement state decrement step using    -\n',
+        '\n',
+        'Choose robot component to command using\n',
+        '                                        q → arm_left\n'
+        '                                        a → arm_right\n'
+        '                                        z → base\n'
+        '\n'
+        ])
+        print(self.intro_message)
 
     def getKey(self,settings):
     
@@ -219,8 +255,10 @@ class KeyboardPress():
             moveBy: np.ndarray = np.array(self.key_bindings[key])
 
         elif key in self.speed_bindings.keys():
-            print(self.speed_bindings[key][1 if component == 'base' else 0])
             self.speed *= self.speed_bindings[key][1 if component == 'base' else 0]
+            
+            clear_line()
+            print(f'Updated increment step for {component} to {self.speed}')
 
             return []
 
@@ -236,7 +274,13 @@ class KeyboardPress():
     
     def checkComponent(self,key):
         if key in self.component_bindings.keys():
+            self.speed = self.default_speed
+
+            clear_line()
+            print(f'Switched to component {self.component_bindings[key]}')
+
             return self.component_bindings[key]
+
         return []
             
 
