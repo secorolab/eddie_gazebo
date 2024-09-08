@@ -161,8 +161,6 @@ class FreddyGazeboPublisher(Node):
 
     
     def evaluate_time(self, time_object: rclpy.time.Time):
-        # Printing this somehow produces a fancy 'slide to the right' animation 
-        # print(time_object.seconds_nanoseconds()[0] + (time_object.seconds_nanoseconds()[1] * 1e-9))
         return time_object.seconds_nanoseconds()[0] + (time_object.seconds_nanoseconds()[1] * 1e-9)
     
 
