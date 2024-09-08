@@ -125,7 +125,7 @@ class FreddyGazeboPublisher(Node):
         # Load initial positions for the arms if using joint_trajectory control for position control
         for component_name in self.components:
             if "arm" in component_name:
-                if self.arm_controller is 'joint_trajectory':
+                if self.arm_controller == 'joint_trajectory':
                     with open('install/freddy_description/share/freddy_description/'+\
                             f'config/initial_positions_{component_name}.yaml') \
                             as initial_position_file:
