@@ -38,13 +38,13 @@ def select_controller(context, *args, **kwargs):
 
     # Load and activate the arm effort controllers
     load_arm_left_effort_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'arm_left_effort_controller'],
         output='screen'
     )
 
     load_arm_right_effort_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'arm_right_effort_controller'],
         output='screen'
     )
@@ -63,23 +63,23 @@ def select_controller(context, *args, **kwargs):
 
     # Load and activate the base controllers
     load_joint_position_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'base_position_controller'],
         output='screen'
     )
 
     load_joint_velocity_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'base_velocity_controller'],
         output='screen'
     )
 
     load_joint_effort_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'base_effort_controller'],
         output='screen'
     )
- 
+
     # Define a dictionary to map the declared base controller type to its corresponding controllers
     base_controller_map = {
         "position": load_joint_position_controller,
@@ -91,13 +91,13 @@ def select_controller(context, *args, **kwargs):
         "effort": [load_arm_right_effort_controller, load_arm_left_effort_controller],
         "joint_trajectory": [load_joint_trajectory_controller_left, load_joint_trajectory_controller_right]
     }
-    
+
     # Check if the declared base and arm controllers are supported
     if declared_base_controller not in base_controller_map:
         raise ValueError(f"Undefined base_controller: {declared_base_controller}")
     elif declared_arm_controller not in arm_controller_map:
         raise ValueError(f"Undefined arm_controller: {declared_arm_controller}")
-    else: 
+    else:
         # Return the selected base and arm controllers for execution
         return [base_controller_map[declared_base_controller], *arm_controller_map[declared_arm_controller]]
 
@@ -108,7 +108,7 @@ def generate_launch_description():
     This function sets up the environment variables, declares the base and arm controllers,
     launches the Gazebo simulation, loads the selected controllers or default controllers,
     and starts the robot state publisher.
-    
+
     Returns:
         LaunchDescription: The launch description for the Freddy robot simulation.
     """
@@ -150,7 +150,7 @@ def generate_launch_description():
 
     # World and robot files
     world_file = os.path.join(pkg_freddy_gazebo, 'worlds', 'my_world.sdf')
-   
+
     robot_description_content = Command(
         [
             PathJoinSubstitution([FindExecutable(name='xacro')]),
@@ -161,7 +161,7 @@ def generate_launch_description():
             ),
         ]
     )
-    
+
     # Load the joint state broadcaster controller on robot spawn -- see function return
     load_joint_state_broadcaster = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
