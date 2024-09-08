@@ -10,6 +10,12 @@ This repository provides a simulation of the mobile dual-manipulator robot Fredd
 - Selectable controllers for the Robile base and Kinova arms using launch arguments
 
 ### Launching the Simulation
+
+> When building the workspace, ensure that the environment variable `GZ_VERSION` is set to `harmonic`. This can be done with the following command:
+>```bash
+>export GZ_VERSION=harmonic
+>```
+
 The simulation can be launched using the following command:
 
 ```bash
@@ -20,7 +26,7 @@ By default, the `base_controller` for controlling the Robile base is a velocity 
 ```bash
 ros2 launch freddy_gazebo freddy_gazebo.launch.py arm_controller:=joint_trajectory base_controller:=position
 ```
-Valid values for `arm_controller` are `joint_trajectory` and `effort`. Valid values for `base_controller` are `position`, `velocity`, and `effort`.
+Valid values for `arm_controller` are `joint_trajectory` and `effort`. Valid values for `base_controller` are `position`, `velocity`, and `effort`. The `joint_trajectory` controller can accept position as well as velocity commands.
 
 ### Commanding the Robot's Joints
 For purposes of demonstration, commands can be given to each joint of each component of the robot through keyboard input. The executable for commanding the robot's joints can be launched using the following command:
@@ -30,8 +36,9 @@ ros2 run freddy_gazebo freddy_gazebo
 
 The behaviour of this executable can be changed to match the controllers used when launching `freddy_gazebo.launch.py`. This can be done by providing `arm_controller` and `base_controller` arguments as follows:
 ```bash
-ros2 run freddy_gazebo freddy_gazebo --ros-args -p arm_controller:=joint_trajectory -p base_controller:=velocity
+ros2 run freddy_gazebo freddy_gazebo --ros-args -p arm_controller:=joint_trajectory_velocity -p base_controller:=velocity
 ```
+Valid values for `arm_controller` are `joint_trajectory_position`, `joint_trajectory_velocity`, and `effort`. Valid values for `base_controller` are `position`, `velocity`, and `effort`. When using a `joint_trajectory_velocity` command scheme, joint positions are additionally rolled out (or integrated) using the commanded velocity.
 
 The robot can be controlled using the keyboard as follows:
 ```
@@ -69,9 +76,21 @@ In the UI, if controller_manager is not already selected, choose it from the dro
 To unload a controller, right-click on the desired controller and select "De-activate and Unload".
 ![Unload the controller for left arm/right arm/base](/doc/images/unload.png)
 
-To load the desired controller, right-click on it and select "Load, Configure and activate'.
-
+To load the desired controller, right-click on it and select 'Load, Configure and activate'.
 ![Load the controller for left arm/right arm/base](/doc/images/load.png)
+
+### System Requirements
+The package has the following environment requirements and dependencies:
+
+- ROS2 Humble
+- Gazebo Harmonic (tested on Gazebo Sim version 8.3.0 and 8.6.0)
+- Python (tested on Python >=3.10)
+- `ros2_control` framwork for real-time control of robots using ROS2
+- `gz_ros2_control` package for integrating the `ros2_control` controller architecture with the Gazebo simulator
+- `freddy_description` package for the Freddy description files
+- `ros2_kortex` package for the Kinowa Gen3 7DoF arm description
+
+Note that the Robotiq gripper has not been integrated or tested for the simulation.
 
 ### References
 
