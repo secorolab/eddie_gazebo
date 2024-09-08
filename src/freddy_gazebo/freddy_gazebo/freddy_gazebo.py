@@ -36,7 +36,7 @@ class FreddyGazeboPublisher(Node):
     verbose (bool): Whether to print debug messages or not
     """
 
-    
+
     def __init__(self, 
                  verbose=False) -> None:
         """
@@ -122,16 +122,18 @@ class FreddyGazeboPublisher(Node):
             },
         }
 
+        # Load initial positions for the arms if using joint_trajectory control for position control
         for component_name in self.components:
             if "arm" in component_name:
-                with open('install/freddy_description/share/freddy_description/'+\
-                        f'config/initial_positions_{component_name}.yaml') \
-                        as initial_position_file:
-                    initial_positions = yaml.safe_load(initial_position_file)
-                    
-                    self.components[component_name]["state"] = np.array(\
-                        [initial_positions[f"joint_{index}"] for index in range(1, 8)]
-                        )
+                if self.arm_controller is 'joint_trajectory':
+                    with open('install/freddy_description/share/freddy_description/'+\
+                            f'config/initial_positions_{component_name}.yaml') \
+                            as initial_position_file:
+                        initial_positions = yaml.safe_load(initial_position_file)
+
+                        self.components[component_name]["state"] = np.array(\
+                            [initial_positions[f"joint_{index}"] for index in range(1, 8)]
+                            )
 
         if self.verbose:
             self.get_logger().info("Loaded keyboard control interface with the following components:")
@@ -182,7 +184,7 @@ class FreddyGazeboPublisher(Node):
                     msg.points.append(trajectory_point)
                     self.components[component_name]["message"] = msg
 
-                else:
+                elif self.arm_controller == 'effort':
                     msg = Float64MultiArray()
                     msg.data = self.components[component_name]["state"].tolist()
 
