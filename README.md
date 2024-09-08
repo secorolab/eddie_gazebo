@@ -4,6 +4,8 @@
 
 This repository provides a simulation of the mobile dual-manipulator robot Freddy in the Gazebo Harmonic simulator. The simulation offers independent control of the Robile base, left Kinova arm, and right Kinova arm components of the robot.
 
+https://github.com/user-attachments/assets/9719dc71-e8f2-4259-aa2a-4f2d219f52aa
+
 ### Features
 - Position, velocity, and effort control for each of the two driven wheels of each Kelo drive of the Robile base
 - Position and velocity trajectory control, and effort joint control, for each Kinova arm
