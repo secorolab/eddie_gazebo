@@ -9,7 +9,7 @@ import rclpy
 import yaml
 from builtin_interfaces.msg import Duration
 from rclpy.node import Node
-from rclpy.publisher import Publisher
+import rclpy.time
 from std_msgs.msg import Float64MultiArray, Header
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
@@ -35,8 +35,6 @@ class FreddyGazeboPublisher(Node):
     Parameters:
     verbose (bool): Whether to print debug messages or not
     """
-
-
     def __init__(self, 
                  verbose=False) -> None:
         """
@@ -53,9 +51,12 @@ class FreddyGazeboPublisher(Node):
         self.declare_parameter('base_controller', 'velocity')
 
         valid_controllers = {
-            'arm': ['joint_trajectory', 'effort'],
+            'arm': ['joint_trajectory_position', 'joint_trajectory_velocity', 'effort'],
             'base': ['position', 'velocity', 'effort']
         }
+
+        # Timer for rolling state forward
+        self.roll_forward_timer = self.create_timer(0.1, self.roll_state_forward)
 
         # Getting declared parameters
         self.arm_controller: str = self.get_parameter('arm_controller').get_parameter_value().string_value
@@ -65,7 +66,7 @@ class FreddyGazeboPublisher(Node):
         assert self.base_controller in valid_controllers['base'], f'Undefined base_controller: {self.base_controller}'
 
         arm_controller_name = \
-            {side: f'arm_{side}_joint_trajectory_controller' if self.arm_controller == 'joint_trajectory' \
+            {side: f'arm_{side}_joint_trajectory_controller' if 'joint_trajectory' in self.arm_controller \
                 else f'arm_{side}_effort_controller' for side in ['left', 'right']}
         base_controller_name = f'base_{self.base_controller}_controller'
 
@@ -76,40 +77,54 @@ class FreddyGazeboPublisher(Node):
                 as param_file:
             controller_params = yaml.safe_load(param_file)
 
+        self.trajectory_durations = {
+            "position": (1, 0),
+            "velocity": (0, int(10e7)),
+            "effort": None,
+        }
+
         self.components = {
             "arm_left": {
                 "publisher": self.create_publisher(
-                    JointTrajectory if self.arm_controller == 'joint_trajectory' \
+                    JointTrajectory if "joint_trajectory" in self.arm_controller \
                         else Float64MultiArray, 
                     f'/{arm_controller_name["left"]}/' + \
-                        ('joint_trajectory' if self.arm_controller == 'joint_trajectory' \
+                        ("joint_trajectory" if "joint_trajectory" in self.arm_controller \
                             else 'commands'), 
                     10,
                     ),
-                "state": np.zeros(7),
-                "message": JointTrajectory() if self.arm_controller == 'joint_trajectory' \
+                "state": {
+                    "position": np.zeros(7),
+                    "velocity": np.zeros(7),
+                    "effort": np.zeros(7),
+                    },
+                "message": JointTrajectory() if "joint_trajectory" in self.arm_controller \
                     else Float64MultiArray(),
                 "joints": controller_params[arm_controller_name["left"]]\
                     ["ros__parameters"]["joints"],
                 "frame_id": "base_link",
-                "trajectory_duration": 1,
+                "trajectory_duration": self.trajectory_durations[self.arm_controller.split("_")[-1]],
             },
             "arm_right": {
                 "publisher": self.create_publisher(
-                    JointTrajectory if self.arm_controller == 'joint_trajectory' \
+                    JointTrajectory if "joint_trajectory" in self.arm_controller \
                         else Float64MultiArray, 
                     f'/{arm_controller_name["right"]}/' + \
-                        ('joint_trajectory' if self.arm_controller == 'joint_trajectory' \
+                        ("joint_trajectory" if "joint_trajectory" in self.arm_controller \
                             else 'commands'), 
                     10,
                     ),
-                "state": np.zeros(7),
-                "message": JointTrajectory() if self.arm_controller == 'joint_trajectory' \
+                "state": {
+                    "position": np.zeros(7),
+                    "velocity": np.zeros(7),
+                    "effort": np.zeros(7),
+                    },
+                "message": JointTrajectory() if "joint_trajectory" in self.arm_controller \
                     else Float64MultiArray(),
                 "joints": controller_params[arm_controller_name["right"]]\
                     ["ros__parameters"]["joints"],
                 "frame_id": "base_link",
-                "trajectory_duration": 1,
+                "trajectory_duration": self.trajectory_durations[self.arm_controller.split("_")[-1]],
             },
             "base": {
                 "publisher": self.create_publisher(
@@ -125,13 +140,13 @@ class FreddyGazeboPublisher(Node):
         # Load initial positions for the arms if using joint_trajectory control for position control
         for component_name in self.components:
             if "arm" in component_name:
-                if self.arm_controller == 'joint_trajectory':
+                if "joint_trajectory" in self.arm_controller:
                     with open('install/freddy_description/share/freddy_description/'+\
                             f'config/initial_positions_{component_name}.yaml') \
                             as initial_position_file:
                         initial_positions = yaml.safe_load(initial_position_file)
 
-                        self.components[component_name]["state"] = np.array(\
+                        self.components[component_name]["state"]["position"] = np.array(\
                             [initial_positions[f"joint_{index}"] for index in range(1, 8)]
                             )
 
@@ -139,6 +154,17 @@ class FreddyGazeboPublisher(Node):
             self.get_logger().info("Loaded keyboard control interface with the following components:")
             pprint(self.components)
 
+        self.rollout_timing = {
+            "previous": self.evaluate_time(self.get_clock().now()),
+            "current": self.evaluate_time(self.get_clock().now()),
+        }
+
+    
+    def evaluate_time(self, time_object: rclpy.time.Time):
+        # Printing this somehow produces a fancy 'slide to the right' animation 
+        # print(time_object.seconds_nanoseconds()[0] + (time_object.seconds_nanoseconds()[1] * 1e-9))
+        return time_object.seconds_nanoseconds()[0] + (time_object.seconds_nanoseconds()[1] * 1e-9)
+    
 
     def update_state(self, component_name: str, increment: np.ndarray, ) -> None:
         """
@@ -149,12 +175,40 @@ class FreddyGazeboPublisher(Node):
             increment (np.ndarray): Increment to apply to the component's state
         """
         # Since commands are of variable length, only take the required number of elements
-        self.components[component_name]["state"] += \
-            increment[:len(self.components[component_name]["state"])]
+        if 'arm' in component_name:
+            if self.arm_controller.split("_")[-1] == "position":
+                self.components[component_name]["state"]["position"] += \
+                    increment[:len(self.components[component_name]["state"]["position"])]
+            elif self.arm_controller.split("_")[-1] == "velocity":
+                self.components[component_name]["state"]["velocity"] += \
+                    increment[:len(self.components[component_name]["state"]["velocity"])]
+            elif self.arm_controller == "effort":
+                self.components[component_name]["state"]["effort"] += \
+                    increment[:len(self.components[component_name]["state"]["effort"])]
+        else:
+            self.components[component_name]["state"] += \
+                increment[:len(self.components[component_name]["state"])]
 
         self.update_messages(component_name)
 
         return None
+
+
+    def roll_state_forward(self, ) -> None:
+        self.rollout_timing["current"] = self.evaluate_time(self.get_clock().now())
+        time_step = self.rollout_timing["current"] - self.rollout_timing["previous"]
+
+        for component_name in self.components:
+            if "arm" in component_name:
+                if self.arm_controller.split("_")[-1] == "velocity":
+                    self.components[component_name]["state"]["position"] += \
+                        self.components[component_name]["state"]["velocity"] * time_step
+                    
+            # Add more state rollouts if required
+
+        self.rollout_timing["previous"] = self.rollout_timing["current"]
+        self.update_messages()
+        self.publish_commands()
 
 
     def update_messages(self, current_component=None) -> None:
@@ -166,7 +220,7 @@ class FreddyGazeboPublisher(Node):
         """
         for component_name in self.components:
             if "arm" in component_name:
-                if self.arm_controller == 'joint_trajectory':
+                if "joint_trajectory" in self.arm_controller:
                     msg = JointTrajectory()
                     msg.header = Header()
                     msg.header.frame_id = self.components[component_name]["frame_id"] 
@@ -174,19 +228,24 @@ class FreddyGazeboPublisher(Node):
 
                     trajectory_point = JointTrajectoryPoint()
                     trajectory_point.positions = \
-                        self.components[component_name]["state"].tolist()
-                    trajectory_point._time_from_start = \
+                        self.components[component_name]["state"]["position"].tolist()
+                    
+                    trajectory_point.time_from_start = \
                         Duration(
-                            sec=self.components[component_name]["trajectory_duration"], 
-                            nanosec=0,
+                            sec=self.components[component_name]["trajectory_duration"][0], 
+                            nanosec=self.components[component_name]["trajectory_duration"][1],
                             )
+                    
+                    if self.arm_controller.split("_")[-1] == "velocity":
+                        trajectory_point.velocities = \
+                            self.components[component_name]["state"]["velocity"].tolist()
 
                     msg.points.append(trajectory_point)
                     self.components[component_name]["message"] = msg
 
                 elif self.arm_controller == 'effort':
                     msg = Float64MultiArray()
-                    msg.data = self.components[component_name]["state"].tolist()
+                    msg.data = self.components[component_name]["state"]["effort"].tolist()
 
                     self.components[component_name]["message"] = msg
 
@@ -196,12 +255,16 @@ class FreddyGazeboPublisher(Node):
 
                 self.components[component_name]["message"] = msg
 
-        clear_line()
         with np.printoptions(suppress=True):
             if current_component is not None:
-                print(f"Updated state of {current_component} to: ", \
-                      np.array(self.components[current_component]["state"]))
-            else:
+                clear_line()
+                if "arm" in current_component:
+                    print(f"Updated state of {current_component} to: ", \
+                          np.array(self.components[current_component]["state"][self.arm_controller.split("_")[-1]]))
+                else:
+                    print(f"Updated state of {current_component} to: ", \
+                          np.array(self.components[current_component]["state"]))
+            elif self.verbose:
                 print(f"Updated states to: ", \
                       [np.array(self.components[component]["state"]) for component in self.components])
 
@@ -358,10 +421,11 @@ def main(args=None):
                 freddy_gazebo_publisher.update_state(component, increment)
 
             # Publish messages
+            freddy_gazebo_publisher.roll_state_forward()
             freddy_gazebo_publisher.publish_commands()
     
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+    #     print(e)
 
     finally:
         rclpy.shutdown()
