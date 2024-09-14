@@ -66,7 +66,7 @@ The default controllers are loaded automatically, and additional controllers can
 
 To download rqt_controller_manager, use the following command:
 ```bash
-pip install rqt_controller_manager
+apt install ros-humble-rqt-controller-manager
 ```
 To run the controller_manager UI, use the following command:
 ```bash
