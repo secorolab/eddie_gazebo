@@ -13,6 +13,11 @@ https://github.com/user-attachments/assets/9719dc71-e8f2-4259-aa2a-4f2d219f52aa
 
 ### Launching the Simulation
 
+The simulation requires `ros2_control` and `ros2_controllers`. Install these packages using the following command:
+```bash
+sudo apt install ros-${ROS_DISTRO}-ros2-control ros-${ROS_DISTRO}-ros2-controllers
+```
+
 > When building the workspace, ensure that the environment variable `GZ_VERSION` is set to `harmonic`. This can be done with the following command:
 >```bash
 >export GZ_VERSION=harmonic
