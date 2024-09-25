@@ -47,7 +47,7 @@ class FreddyGazeboPublisher(Node):
         self.verbose = verbose
 
         # Declare controller parameters
-        self.declare_parameter('arm_controller', 'joint_trajectory')
+        self.declare_parameter('arm_controller', 'joint_trajectory_position')
         self.declare_parameter('base_controller', 'velocity')
 
         valid_controllers = {
