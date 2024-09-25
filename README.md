@@ -18,13 +18,23 @@ The simulation requires `ros2_control` and `ros2_controllers`. Install these pac
 sudo apt install ros-${ROS_DISTRO}-ros2-control ros-${ROS_DISTRO}-ros2-controllers
 ```
 
+The package's dependencies can be installed with the following command:
+```bash
+cd ./src
+vcs import < freddy_gazebo/dep.repos
+```
+
+If you are using ROS2 Humble, install Gazebo Harmonic using the following command. Note that Gazebo Harmonic and ROS2 Humble is a 'non-default Gazebo/ROS2 pairing'.
+```bash
+apt-get install ros-humble-ros-gzgarden
+```
+
 > When building the workspace, ensure that the environment variable `GZ_VERSION` is set to `harmonic`. This can be done with the following command:
 >```bash
 >export GZ_VERSION=harmonic
 >```
 
 The simulation can be launched using the following command:
-
 ```bash
 ros2 launch freddy_gazebo freddy_gazebo.launch.py
 ```
