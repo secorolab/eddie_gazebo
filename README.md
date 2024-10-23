@@ -1,15 +1,34 @@
-# ss24-gazebo-simulation-freddy
+# Simulation of the Eddie robot in Gazebo
 
-## Simulation of the Freddy robot in Gazebo Harmonic
-
-This repository provides a simulation of the mobile dual-manipulator robot Freddy in the Gazebo Harmonic simulator. The simulation offers independent control of the Robile base, left Kinova arm, and right Kinova arm components of the robot.
+This repository provides a simulation of the mobile dual-manipulator robot Freddy in the Gazebo simulator. The simulation offers independent control of the mobile base and the dual arms of the robot.
 
 https://github.com/user-attachments/assets/9719dc71-e8f2-4259-aa2a-4f2d219f52aa
 
+## Tested Environments
+
+The following environments have been tested for compatibility with this repository:
+
+### Operating System
+- **Ubuntu 22.04 LTS**
+
+### Software, Libraries, and Languages
+- **Gazebo Version**: Harmonic (tested on Gazebo Sim version 8.3.0 and 8.6.0)
+- **ROS Distribution**: Humble (on Ubuntu 22.04)
+- **ROS2-Control**: ros-humble-ros2-controllers
+- **Python**: >=3.10 (tested on Python 3.10)
+
+### Linked Repositories
+The following repositories were tested with specific versions or commits:
+
+- **[ros2_kortex](https://github.com/a2s-institute/ros2_kortex.git)**: Commit [`c0af316`](https://github.com/a2s-institute/ros2_kortex/commit/c0af31670108ea1b09ba31a1ed676ae3a7dbf525)
+- **[freddy_description](https://github.com/a2s-institute/freddy_description.git)**: Branch `main`, as of commit [`80fb517`](https://github.com/a2s-institute/freddy_description/commit/80fb5173bfc2efaf1b5b70838e09d1f670a0c2ea)
+- **[gz_ros2_control](https://github.com/a2s-institute/gz_ros2_control.git)**: Branch `rolling`, as of commit [`e19b0ef`](https://github.com/a2s-institute/gz_ros2_control/commit/e19b0eff2618ed341496a345d50f11b2365b1a1e)
+
+
 ### Features
-- Position, velocity, and effort control for each of the two driven wheels of each Kelo drive of the Robile base
-- Position and velocity trajectory control, and effort joint control, for each Kinova arm
-- Selectable controllers for the Robile base and Kinova arms using launch arguments
+- Position, velocity, and effort control for each of the two driven wheels of each Kelo wheel drive unit of the mobile base
+- Position and velocity trajectory control, and effort joint control for each Kinova arm
+- Selectable controllers for the mobile base and Kinova arms using launch arguments
 
 ### Launching the Simulation
 
@@ -25,9 +44,14 @@ https://github.com/user-attachments/assets/9719dc71-e8f2-4259-aa2a-4f2d219f52aa
 >vcs import < freddy_gazebo/dep.repos
 >```
 >
->If you are using ROS2 Humble, install Gazebo Harmonic using the following command. Note that Gazebo Harmonic and ROS2 Humble is a 'non-default Gazebo/ROS2 pairing'.
+>If you are using ROS2 Humble, install Gazebo Harmonic using the following command. Note that Gazebo Harmonic and ROS2 Humble is a 'non-default Gazebo/ROS2 pairing'. These commands are referred from [Gazebo Harmonic](https://staging.gazebosim.org/docs/harmonic/install_ubuntu) binary installation documentation
 >```bash
->apt-get install ros-humble-ros-gzgarden
+>sudo apt-get update
+>sudo apt-get install lsb-release wget gnupg
+>sudo wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+>echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+>sudo apt-get update
+>sudo apt-get install gz-harmonic
 >```
 >
 > When building the workspace, ensure that the environment variable `GZ_VERSION` is set to `harmonic`. This can be done with the following command:
@@ -40,11 +64,15 @@ The simulation can be launched using the following command:
 ros2 launch freddy_gazebo freddy_gazebo.launch.py
 ```
 
-By default, the `base_controller` for controlling the Robile base is a velocity controller and the `arm_controller` for controlling the Kinova arms is a `trajectory_controller`. You can customize the base_controller and arm_controller by providing launch arguments, for example:
+By default, the `base_controller` for controlling the mobile base is a velocity controller and the `arm_controller` for controlling the Kinova arms is a `trajectory_controller`. You can customize the base_controller and arm_controller by providing launch arguments, for example:
 ```bash
 ros2 launch freddy_gazebo freddy_gazebo.launch.py arm_controller:=joint_trajectory base_controller:=position
 ```
-Valid values for `arm_controller` are `joint_trajectory` and `effort`. Valid values for `base_controller` are `position`, `velocity`, and `effort`. The `joint_trajectory` controller can accept position as well as velocity commands.
+
+Valid values for `arm_controller` are `joint_trajectory` and `effort`. 
+Valid values for `base_controller` are `position`, `velocity`, and `effort`. 
+
+The `joint_trajectory` controller can accept position as well as velocity commands.
 
 ### Commanding the Robot's Joints
 For purposes of demonstration, commands can be given to each joint of each component of the robot through keyboard input. The executable for commanding the robot's joints can be launched using the following command:
@@ -97,18 +125,8 @@ To unload a controller, right-click on the desired controller and select "De-act
 To load the desired controller, right-click on it and select 'Load, Configure and activate'.
 ![Load the controller for left arm/right arm/base](/doc/images/load.png)
 
-### System Requirements
-The package has the following environment requirements and dependencies:
-
-- ROS2 Humble
-- Gazebo Harmonic (tested on Gazebo Sim version 8.3.0 and 8.6.0)
-- Python (tested on Python >=3.10)
-- `ros2_control` framwork for real-time control of robots using ROS2
-- `gz_ros2_control` package for integrating the `ros2_control` controller architecture with the Gazebo simulator
-- `freddy_description` package for the Freddy description files
-- `ros2_kortex` package for the Kinowa Gen3 7DoF arm description
-
-Note that the Robotiq gripper has not been integrated or tested for the simulation.
+### Note: 
+The Robotiq gripper has not been integrated or tested for the simulation.
 
 ### References
 
