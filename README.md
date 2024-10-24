@@ -1,6 +1,6 @@
 # Simulation of the Eddie robot in Gazebo
 
-This repository provides a simulation of the mobile dual-manipulator robot Freddy in the Gazebo simulator. The simulation offers independent control of the mobile base and the dual arms of the robot.
+This repository provides a simulation of the mobile dual-manipulator robot Eddie in the Gazebo simulator. The simulation offers independent control of the mobile base and the dual arms of the robot.
 
 https://github.com/user-attachments/assets/9719dc71-e8f2-4259-aa2a-4f2d219f52aa
 
