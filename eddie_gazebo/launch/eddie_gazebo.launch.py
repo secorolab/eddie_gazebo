@@ -103,14 +103,14 @@ def select_controller(context, *args, **kwargs):
 
 
 def generate_launch_description():
-    """Generates the launch description for the Freddy robot simulation.
+    """Generates the launch description for the Eddie robot simulation.
 
     This function sets up the environment variables, declares the base and arm controllers,
     launches the Gazebo simulation, loads the selected controllers or default controllers,
     and starts the robot state publisher.
 
     Returns:
-        LaunchDescription: The launch description for the Freddy robot simulation.
+        LaunchDescription: The launch description for the Eddie robot simulation.
     """
     # Configuration to use simulation time (use by default)
     use_sim_time = LaunchConfiguration('use_sim_time', default=True)
@@ -130,15 +130,15 @@ def generate_launch_description():
     )
 
     # Get package directories
-    pkg_freddy_gazebo = get_package_share_directory('freddy_gazebo')
-    pkg_freddy_description = get_package_share_directory('freddy_description')
+    pkg_eddie_gazebo = get_package_share_directory('eddie_gazebo')
+    pkg_eddie_description = get_package_share_directory('eddie_description')
 
     # Resource paths to be added to the GZ_SIM_RESOURCE_PATH environment variable
     resource_paths = [
-        pkg_freddy_description,
-        os.path.join(pkg_freddy_description, 'freddy_base_description', 'meshes'),
-        os.path.join(pkg_freddy_description, 'freddy_base_description', 'meshes', 'sensors'),
-        os.path.join(pkg_freddy_description, 'freddy_torso_description', 'meshes'),
+        pkg_eddie_description,
+        os.path.join(pkg_eddie_description, 'eddie_base_description', 'meshes'),
+        os.path.join(pkg_eddie_description, 'eddie_base_description', 'meshes', 'sensors'),
+        os.path.join(pkg_eddie_description, 'eddie_torso_description', 'meshes'),
     ]
     resource_paths_str = os.pathsep.join(resource_paths)
 
@@ -149,15 +149,15 @@ def generate_launch_description():
     )
 
     # World and robot files
-    world_file = os.path.join(pkg_freddy_gazebo, 'worlds', 'my_world.sdf')
+    world_file = os.path.join(pkg_eddie_gazebo, 'worlds', 'my_world.sdf')
 
     robot_description_content = Command(
         [
             PathJoinSubstitution([FindExecutable(name='xacro')]),
             ' ',
             PathJoinSubstitution(
-                [FindPackageShare('freddy_description'),
-                 'robots', 'freddy_gz.urdf.xacro']
+                [FindPackageShare('eddie_description'),
+                 'robots', 'eddie_gz.urdf.xacro']
             ),
         ]
     )

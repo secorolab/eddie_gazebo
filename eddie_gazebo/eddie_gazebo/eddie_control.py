@@ -25,7 +25,7 @@ def clear_line(n=1):
         print(LINE_UP, end=LINE_CLEAR)
 
 
-class FreddyGazeboPublisher(Node):
+class EddieGazeboPublisher(Node):
     """
     This class is responsible for publishing commands to the robot's components.
     
@@ -38,12 +38,12 @@ class FreddyGazeboPublisher(Node):
     def __init__(self, 
                  verbose=False) -> None:
         """
-        Initializes the FreddyGazeboPublisher instance
+        Initializes the EddieGazeboPublisher instance
         
         Args:
             verbose (bool): Whether to print debug messages or not
         """
-        super().__init__('FreddyGazeboPublisher')
+        super().__init__('EddieGazeboPublisher')
         self.verbose = verbose
 
         # Declare controller parameters
@@ -73,7 +73,7 @@ class FreddyGazeboPublisher(Node):
         self.get_logger().info(f"Setting up command interface for selected arm controller: {arm_controller_name}")
         self.get_logger().info(f"Setting up command interface for selected base controller: {base_controller_name}")
 
-        with open('install/freddy_gazebo/share/freddy_gazebo/config/freddy_controller.yaml') \
+        with open('install/eddie_gazebo/share/eddie_gazebo/config/eddie_controller.yaml') \
                 as param_file:
             controller_params = yaml.safe_load(param_file)
 
@@ -141,7 +141,7 @@ class FreddyGazeboPublisher(Node):
         for component_name in self.components:
             if "arm" in component_name:
                 if "joint_trajectory" in self.arm_controller:
-                    with open('install/freddy_description/share/freddy_description/'+\
+                    with open('install/eddie_description/share/eddie_description/'+\
                             f'config/initial_positions_{component_name}.yaml') \
                             as initial_position_file:
                         initial_positions = yaml.safe_load(initial_position_file)
@@ -319,7 +319,7 @@ class KeyboardPress():
 
         self.intro_message = ''.join([
         '\n',
-        'Keyboard interface for commanding the Freddy robot in simulation\n',
+        'Keyboard interface for commanding the Eddie robot in simulation\n',
         '\n',
         'Increment state using     w   e   r   t   y   u   i   o\n',
         '                          ↑   ↑   ↑   ↑   ↑   ↑   ↑   ↑\n',
@@ -388,11 +388,11 @@ class KeyboardPress():
 
 def main(args=None):
     rclpy.init(args=args)
-    freddy_gazebo_publisher = FreddyGazeboPublisher()
+    eddie_gazebo_publisher = EddieGazeboPublisher()
     keyboard_press = KeyboardPress()
     component = 'arm_left' # by default component = base
     
-    spinner = threading.Thread(target=rclpy.spin, args=(freddy_gazebo_publisher,))
+    spinner = threading.Thread(target=rclpy.spin, args=(eddie_gazebo_publisher,))
     spinner.start()
 
     try:
@@ -416,11 +416,11 @@ def main(args=None):
                 break
 
             elif len(increment):
-                freddy_gazebo_publisher.update_state(component, increment)
+                eddie_gazebo_publisher.update_state(component, increment)
 
             # Publish messages
-            freddy_gazebo_publisher.roll_state_forward()
-            freddy_gazebo_publisher.publish_commands()
+            eddie_gazebo_publisher.roll_state_forward()
+            eddie_gazebo_publisher.publish_commands()
     
     # except Exception as e:
     #     print(e)

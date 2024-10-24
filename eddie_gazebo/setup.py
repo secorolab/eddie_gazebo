@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 import glob
 
-package_name = 'freddy_gazebo'
+package_name = 'eddie_gazebo'
 
 setup(
     name=package_name,
@@ -29,7 +29,7 @@ setup(
         'console_scripts': [
             f'control_publisher = {package_name}.control_publisher:main',
             f'arms_control = {package_name}.arms_control:main',
-            f'freddy_control = {package_name}.freddy_control:main',
+            f'eddie_control = {package_name}.eddie_control:main',
         ],
     },
 )

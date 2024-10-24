@@ -21,7 +21,7 @@ The following environments have been tested for compatibility with this reposito
 The following repositories were tested with specific versions or commits:
 
 - **[ros2_kortex](https://github.com/a2s-institute/ros2_kortex.git)**: Commit [`c0af316`](https://github.com/a2s-institute/ros2_kortex/commit/c0af31670108ea1b09ba31a1ed676ae3a7dbf525)
-- **[freddy_description](https://github.com/a2s-institute/freddy_description.git)**: Branch `main`, as of commit [`80fb517`](https://github.com/a2s-institute/freddy_description/commit/80fb5173bfc2efaf1b5b70838e09d1f670a0c2ea)
+- **[eddie_description](https://github.com/a2s-institute/eddie_description.git)**: Branch `main`, as of commit [`80fb517`](https://github.com/a2s-institute/eddie_description/commit/80fb5173bfc2efaf1b5b70838e09d1f670a0c2ea)
 - **[gz_ros2_control](https://github.com/a2s-institute/gz_ros2_control.git)**: Branch `rolling`, as of commit [`e19b0ef`](https://github.com/a2s-institute/gz_ros2_control/commit/e19b0eff2618ed341496a345d50f11b2365b1a1e)
 
 
@@ -41,7 +41,7 @@ The following repositories were tested with specific versions or commits:
 >The package's dependencies can be installed with the following command:
 >```bash
 >cd ./src
->vcs import < freddy_gazebo/dep.repos
+>vcs import < eddie_gazebo/dep.repos
 >```
 >
 >If you are using ROS2 Humble, install Gazebo Harmonic using the following command. Note that Gazebo Harmonic and ROS2 Humble is a 'non-default Gazebo/ROS2 pairing'. These commands are referred from [Gazebo Harmonic](https://staging.gazebosim.org/docs/harmonic/install_ubuntu) binary installation documentation
@@ -61,12 +61,12 @@ The following repositories were tested with specific versions or commits:
 
 The simulation can be launched using the following command:
 ```bash
-ros2 launch freddy_gazebo freddy_gazebo.launch.py
+ros2 launch eddie_gazebo eddie_gazebo.launch.py
 ```
 
 By default, the `base_controller` for controlling the mobile base is a velocity controller and the `arm_controller` for controlling the Kinova arms is a `trajectory_controller`. You can customize the base_controller and arm_controller by providing launch arguments, for example:
 ```bash
-ros2 launch freddy_gazebo freddy_gazebo.launch.py arm_controller:=joint_trajectory base_controller:=position
+ros2 launch eddie_gazebo eddie_gazebo.launch.py arm_controller:=joint_trajectory base_controller:=position
 ```
 
 Valid values for `arm_controller` are `joint_trajectory` and `effort`. 
@@ -77,12 +77,12 @@ The `joint_trajectory` controller can accept position as well as velocity comman
 ### Commanding the Robot's Joints
 For purposes of demonstration, commands can be given to each joint of each component of the robot through keyboard input. The executable for commanding the robot's joints can be launched using the following command:
 ```bash
-ros2 run freddy_gazebo freddy_gazebo
+ros2 run eddie_gazebo eddie_gazebo
 ```
 
-The behaviour of this executable can be changed to match the controllers used when launching `freddy_gazebo.launch.py`. This can be done by providing `arm_controller` and `base_controller` arguments as follows:
+The behaviour of this executable can be changed to match the controllers used when launching `eddie_gazebo.launch.py`. This can be done by providing `arm_controller` and `base_controller` arguments as follows:
 ```bash
-ros2 run freddy_gazebo freddy_gazebo --ros-args -p arm_controller:=joint_trajectory_velocity -p base_controller:=velocity
+ros2 run eddie_gazebo eddie_gazebo --ros-args -p arm_controller:=joint_trajectory_velocity -p base_controller:=velocity
 ```
 Valid values for `arm_controller` are `joint_trajectory_position`, `joint_trajectory_velocity`, and `effort`. Valid values for `base_controller` are `position`, `velocity`, and `effort`. When using a `joint_trajectory_velocity` command scheme, joint positions are additionally rolled out (or integrated) using the commanded velocity.
 
