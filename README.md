@@ -14,15 +14,15 @@ The following environments have been tested for compatibility with this reposito
 ### Software, Libraries, and Languages
 - **Gazebo Version**: Harmonic (tested on Gazebo Sim version 8.3.0 and 8.6.0)
 - **ROS Distribution**: Humble (on Ubuntu 22.04)
-- **ROS2-Control**: ros-humble-ros2-controllers
+- **ROS2-Control**: ros-humble-ros2-control, ros-humble-ros2-controllers
 - **Python**: >=3.10 (tested on Python 3.10)
 
 ### Linked Repositories
 The following repositories were tested with specific versions or commits:
 
-- **[ros2_kortex](https://github.com/a2s-institute/ros2_kortex.git)**: Commit [`c0af316`](https://github.com/a2s-institute/ros2_kortex/commit/c0af31670108ea1b09ba31a1ed676ae3a7dbf525)
-- **[eddie_description](https://github.com/a2s-institute/eddie_description.git)**: Branch `main`, as of commit [`80fb517`](https://github.com/a2s-institute/eddie_description/commit/80fb5173bfc2efaf1b5b70838e09d1f670a0c2ea)
-- **[gz_ros2_control](https://github.com/a2s-institute/gz_ros2_control.git)**: Branch `rolling`, as of commit [`e19b0ef`](https://github.com/a2s-institute/gz_ros2_control/commit/e19b0eff2618ed341496a345d50f11b2365b1a1e)
+- **[ros2_kortex](https://github.com/Kinovarobotics/ros2_kortex)**: `main` branch
+- **[eddie_description](https://github.com/secorolab/eddie_description.git)**: `main` branch
+- **[gz_ros2_control](https://github.com/ros-controls/gz_ros2_control)**: `rolling` branch
 
 
 ### Features
