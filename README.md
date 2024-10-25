@@ -14,7 +14,7 @@ The following environments have been tested for compatibility with this reposito
 ### Software, Libraries, and Languages
 - **Gazebo Version**: Harmonic (tested on Gazebo Sim version 8.3.0 and 8.6.0)
 - **ROS Distribution**: Humble (on Ubuntu 22.04)
-- **ROS2-Control**: ros-humble-ros2-control, ros-humble-ros2-controllers
+- **ROS2-Control**: ros-humble-ros2-control, ros-humble-ros2-controllers, ros_gz_sim
 - **Python**: >=3.10 (tested on Python 3.10)
 
 ### Linked Repositories
@@ -35,7 +35,7 @@ The following repositories were tested with specific versions or commits:
 >### Prerequisites
 >The simulation requires `ros2_control` and `ros2_controllers`. Install these packages using the following command:
 >```bash
->sudo apt install ros-${ROS_DISTRO}-ros2-control ros-${ROS_DISTRO}-ros2-controllers
+>sudo apt install ros-${ROS_DISTRO}-ros2-control ros-${ROS_DISTRO}-ros2-controllers ros_gz_sim
 >```
 >
 >The package's dependencies can be installed with the following command:
@@ -44,12 +44,12 @@ The following repositories were tested with specific versions or commits:
 >vcs import < eddie_gazebo/dep.repos
 >```
 >
->If you are using ROS2 Humble, install Gazebo Harmonic using the following command. Note that Gazebo Harmonic and ROS2 Humble is a 'non-default Gazebo/ROS2 pairing'. These commands are referred from [Gazebo Harmonic](https://staging.gazebosim.org/docs/harmonic/install_ubuntu) binary installation documentation
+>If you are using ROS2 Humble, install Gazebo Harmonic using the following command. Note that Gazebo Harmonic and ROS2 Humble is a 'non-default Gazebo/ROS2 pairing'.
 >```bash
 >sudo apt-get update
 >sudo apt-get install lsb-release wget gnupg
 >sudo wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
->echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+>echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/>gazebo-stable.list > /dev/null
 >sudo apt-get update
 >sudo apt-get install gz-harmonic
 >```

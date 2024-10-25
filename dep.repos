@@ -1,13 +1,13 @@
 repositories:
   ros2_kortex:
     type: git
-    url: https://github.com/Kinovarobotics/ros2_kortex
-    version: main
+    url: https://github.com/a2s-institute/ros2_kortex.git
+    version: gz-devel
   eddie_description:
     type: git
     url: https://github.com/secorolab/eddie_description.git
     version: main
   gz_ros2_control:
     type: git
-    url: https://github.com/ros-controls/gz_ros2_control
-    version: rolling
+    url: https://github.com/a2s-institute/gz_ros2_control.git
+    version: sim-dev    
