@@ -78,6 +78,29 @@ colcon build
 source ~/eddie_ws/install/setup.bash
 ```
 
+## Docker
+
+### Build the Docker Image
+
+```bash
+cd ~/eddie_ws/src/eddie_gazebo
+
+docker build -t eddie_gazebo .
+```
+
+### Run the Docker Container
+
+```bash
+# to view the GUI on host machine
+xhost +local:root
+
+# to run the container with GUI support and interactively
+sudo docker run -it --rm --runtime=nvidia --gpus all  \
+    -e DISPLAY=$DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    eddie_gazebo:latest
+```
+
 ## Usage
 
 ### Launch the simulation

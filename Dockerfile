@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     ros-jazzy-ros-gz \
     ros-jazzy-ros2-control \
     ros-jazzy-ros2-controllers \
-    && rm -rf /var/lib/apt/lists/*
+    ros-jazzy-gz-ros2-control \
+    ros-jazzy-joint-state-broadcaster
 
 # Create workspace directory
 RUN mkdir -p /root/eddie_ws/src
