@@ -80,6 +80,10 @@ source ~/eddie_ws/install/setup.bash
 
 ## Docker
 
+### Setup NVIDIA Runtime for Docker
+
+Install the [nvidia-container-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) and configure it for the Docker.
+
 ### Build the Docker Image
 
 ```bash
@@ -108,6 +112,10 @@ sudo docker run -it --rm --runtime=nvidia --gpus all  \
 ```bash
 ros2 launch eddie_gazebo eddie_gazebo.launch.py
 ```
+
+- To move the base using `Teleop`, select the `Teleop` from the `Tools` menu in the Gazebo GUI.
+- Change the `topic` to `/model/robot/cmd_vel` and Enter.
+- Then, you can move the robot using the selected controls.
 
 1. By default, the `base_controller` for controlling the mobile base is a velocity controller and
    the `arm_controller` for controlling the Kinova arms is a `trajectory_controller`. You can
@@ -153,7 +161,8 @@ Choose robot component to command using
 ```
 
 ---
-> [!WARNING] The below instructions are not yet tested and may not work as expected.
+> [!WARNING]
+> The below instructions are not yet tested and may not work as expected.
 
 The behaviour of this executable can be changed to match the controllers used when launching
 `eddie_gazebo.launch.py`. This can be done by providing `arm_controller` and `base_controller`
