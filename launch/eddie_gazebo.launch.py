@@ -192,14 +192,11 @@ def generate_launch_description():
     # Resource paths to be added to the GZ_SIM_RESOURCE_PATH environment variable
     resource_paths = [
         pkg_eddie_description,
-        os.path.join(pkg_eddie_description, "eddie_base_description", "meshes"),
-        os.path.join(
-            pkg_eddie_description, "eddie_base_description", "meshes", "sensors"
-        ),
-        os.path.join(pkg_eddie_description, "eddie_torso_description", "meshes"),
+        os.path.join(pkg_eddie_description, "meshes"),
     ]
     resource_paths_str = os.pathsep.join(resource_paths)
-
+    print("#############################################################", resource_paths_str)
+    print("resource_paths_str: ", resource_paths_str)
     # Set the environment variable GZ_SIM_RESOURCE_PATH to include the resource paths
     set_env_vars_resources = AppendEnvironmentVariable(
         name="GZ_SIM_RESOURCE_PATH",
@@ -214,7 +211,7 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("eddie_description"), "robots", "eddie.urdf.xacro"]
+                [FindPackageShare("eddie_description"), "urdf", "eddie_robot.urdf.xacro"]
             ),
         ]
     )

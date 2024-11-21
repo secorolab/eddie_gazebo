@@ -5,21 +5,21 @@ from builtin_interfaces.msg import Duration
 from std_msgs.msg import Header  
  
 
-arm_left_joints = [ "kinova_left_joint_1",
-      "kinova_left_joint_2",
-       "kinova_left_joint_3",
-      "kinova_left_joint_4",
-      "kinova_left_joint_5",
-      "kinova_left_joint_6",
-      "kinova_left_joint_7"]
+arm_left_joints = [ "eddie_left_arm_joint_1",
+      "eddie_left_arm_joint_2",
+       "eddie_left_arm_joint_3",
+      "eddie_left_arm_joint_4",
+      "eddie_left_arm_joint_5",
+      "eddie_left_arm_joint_6",
+      "eddie_left_arm_joint_7"]
 
-arm_right_joints = [ "kinova_right_joint_1",
-      "kinova_right_joint_2",
-       "kinova_right_joint_3",
-      "kinova_right_joint_4",
-      "kinova_right_joint_5",
-      "kinova_right_joint_6",
-      "kinova_right_joint_7"]
+arm_right_joints = [ "eddie_right_arm_joint_1",
+      "eddie_right_arm_joint_2",
+       "eddie_right_arm_joint_3",
+      "eddie_right_arm_joint_4",
+      "eddie_right_arm_joint_5",
+      "eddie_right_arm_joint_6",
+      "eddie_right_arm_joint_7"]
 
 class ArmControllerPublisher(Node):
     """This class executes a sample trajectory for a robotic arm
