@@ -29,13 +29,13 @@ controller_manager:
 arm_left_joint_trajectory_controller:
   ros__parameters:
     joints:
-      - eddie_right_arm_joint1
-      - eddie_right_arm_joint2
-      - eddie_right_arm_joint3
-      - eddie_right_arm_joint4
-      - eddie_right_arm_joint5
-      - eddie_right_arm_joint6
-      - eddie_right_arm_joint7
+      - eddie_left_arm_joint_1
+      - eddie_left_arm_joint_2
+      - eddie_left_arm_joint_3
+      - eddie_left_arm_joint_4
+      - eddie_left_arm_joint_5
+      - eddie_left_arm_joint_6
+      - eddie_left_arm_joint_7
     command_interfaces:
       - position
     state_interfaces:
@@ -96,13 +96,13 @@ arm_right_effort_controller:
 arm_left_effort_controller:
   ros__parameters:
     joints:
-      - eddie_right_arm_joint1
-      - eddie_right_arm_joint2
-      - eddie_right_arm_joint3
-      - eddie_right_arm_joint4
-      - eddie_right_arm_joint5
-      - eddie_right_arm_joint6
-      - eddie_right_arm_joint7
+      - eddie_left_arm_joint_1
+      - eddie_left_arm_joint_2
+      - eddie_left_arm_joint_3
+      - eddie_left_arm_joint_4
+      - eddie_left_arm_joint_5
+      - eddie_left_arm_joint_6
+      - eddie_left_arm_joint_7
     command_interfaces:
       - effort
     state_interfaces:

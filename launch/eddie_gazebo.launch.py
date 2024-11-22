@@ -44,89 +44,89 @@ def select_controller(context, *args, **kwargs):
     declared_arm_controller = LaunchConfiguration("arm_controller").perform(context)
 
     # Load and activate the arm effort controllers
-    load_arm_left_effort_controller = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "control",
-            "load_controller",
-            "--set-state",
-            "active",
+    load_arm_left_effort_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
             "arm_left_effort_controller",
+            "-c",
+            "controller_manager",
+            "--controller-manager-timeout",
+            "30",
         ],
-        output="screen",
     )
 
-    load_arm_right_effort_controller = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "control",
-            "load_controller",
-            "--set-state",
-            "active",
+    load_arm_right_effort_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
             "arm_right_effort_controller",
+            "-c",
+            "controller_manager",
+            "--controller-manager-timeout",
+            "30",
         ],
-        output="screen",
     )
 
     # Load and activate the arm joint trajectory controllers
-    load_joint_trajectory_controller_left = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "control",
-            "load_controller",
-            "--set-state",
-            "active",
+    load_joint_trajectory_controller_left = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
             "arm_left_joint_trajectory_controller",
+            "-c",
+            "controller_manager",
+            "--controller-manager-timeout",
+            "30",
         ],
-        output="both",
     )
-    load_joint_trajectory_controller_right = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "control",
-            "load_controller",
-            "--set-state",
-            "active",
+    load_joint_trajectory_controller_right = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
             "arm_right_joint_trajectory_controller",
+            "-c",
+            "controller_manager",
+            "--controller-manager-timeout",
+            "30",
         ],
-        output="both",
     )
 
     # Load and activate the base controllers
-    load_joint_position_controller = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "control",
-            "load_controller",
-            "--set-state",
-            "active",
+    load_joint_position_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
             "base_position_controller",
+            "-c",
+            "controller_manager",
+            "--controller-manager-timeout",
+            "30",
         ],
-        output="screen",
     )
 
-    load_joint_velocity_controller = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "control",
-            "load_controller",
-            "--set-state",
-            "active",
+    load_joint_velocity_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
             "base_velocity_controller",
+            "-c",
+            "controller_manager",
+            "--controller-manager-timeout",
+            "30",
         ],
-        output="screen",
     )
 
-    load_joint_effort_controller = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "control",
-            "load_controller",
-            "--set-state",
-            "active",
+    load_joint_effort_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
             "base_effort_controller",
+            "-c",
+            "controller_manager",
+            "--controller-manager-timeout",
+            "30",
         ],
-        output="screen",
     )
 
     # Define a dictionary to map the declared base controller type to its corresponding controllers
@@ -153,7 +153,7 @@ def select_controller(context, *args, **kwargs):
         # Return the selected base and arm controllers for execution
         return [
             base_controller_map[declared_base_controller]
-        ]  # , *arm_controller_map[declared_arm_controller]]
+         , *arm_controller_map[declared_arm_controller]]
 
 
 def generate_launch_description():
@@ -220,20 +220,24 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("eddie_description"), "urdf", "eddie_robot.urdf.xacro"]
+                [
+                    FindPackageShare("eddie_description"),
+                    "urdf",
+                    "eddie_robot.urdf.xacro",
+                ]
             ),
         ]
     )
 
-    # Load the joint state broadcaster controller on robot spawn -- see function return
-    load_joint_state_broadcaster = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "control",
-            "load_controller",
-            "--set-state",
-            "active",
+    load_joint_state_broadcaster = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
             "joint_state_broadcaster",
+            "-c",
+            "controller_manager",
+            "--controller-manager-timeout",
+            "30",
         ],
         output="screen",
     )
@@ -266,10 +270,8 @@ def generate_launch_description():
     return LaunchDescription(
         [
             set_env_vars_resources,
-            # Declare and set base and arm controllers through launch arguments
             declare_base_controller_type,
             declare_arm_controller_type,
-            # Launch gazebo environment
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     [
@@ -282,7 +284,14 @@ def generate_launch_description():
                         )
                     ]
                 ),
-                launch_arguments=[("gz_args", [f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"])],
+                launch_arguments=[
+                    (
+                        "gz_args",
+                        [
+                            f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"
+                        ],
+                    )
+                ],
             ),
             RegisterEventHandler(
                 event_handler=OnProcessExit(
@@ -290,7 +299,6 @@ def generate_launch_description():
                     on_exit=[load_joint_state_broadcaster],
                 )
             ),
-            # Load selected controllers or default controllers
             RegisterEventHandler(
                 event_handler=OnProcessExit(
                     target_action=load_joint_state_broadcaster,
@@ -299,7 +307,6 @@ def generate_launch_description():
             ),
             node_robot_state_publisher,
             gz_spawn_entity,
-            # Launch Arguments
             DeclareLaunchArgument(
                 "use_sim_time",
                 default_value=use_sim_time,

@@ -73,7 +73,7 @@ class EddieGazeboPublisher(Node):
         self.get_logger().info(f"Setting up command interface for selected arm controller: {arm_controller_name}")
         self.get_logger().info(f"Setting up command interface for selected base controller: {base_controller_name}")
 
-        with open('install/eddie_gazebo/share/eddie_gazebo/config/eddie_controller.yaml') \
+        with open('install/eddie_gazebo/share/eddie_gazebo/config/eddie_controllers.yaml') \
                 as param_file:
             controller_params = yaml.safe_load(param_file)
 
