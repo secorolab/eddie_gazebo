@@ -176,6 +176,11 @@ def generate_launch_description():
         description="Specify controller for base (position, velocity, effort) (default: velocity)",
     )
 
+    # Declare path of rviz configuration file
+    eddie_rviz_config_file = os.path.join(
+        get_package_share_directory("eddie_description"), "config/rviz", "eddie.rviz"
+    )
+    
     # Declare the arm controller argument with a default value of "joint_trajectory"
     declare_arm_controller_type = DeclareLaunchArgument(
         "arm_controller",
@@ -266,12 +271,21 @@ def generate_launch_description():
             "true",
         ],
     )
+    
+    rviz2_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        arguments=['-d', eddie_rviz_config_file],
+        output="screen",
+    )    
 
     return LaunchDescription(
         [
             set_env_vars_resources,
             declare_base_controller_type,
             declare_arm_controller_type,
+            rviz2_node,
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     [
