@@ -1,17 +1,16 @@
 import os
 
-import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     AppendEnvironmentVariable,
+    SetEnvironmentVariable,
     DeclareLaunchArgument,
     ExecuteProcess,
     IncludeLaunchDescription,
     OpaqueFunction,
     RegisterEventHandler,
 )
-from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
@@ -21,7 +20,6 @@ from launch.substitutions import (
     PathJoinSubstitution,
 )
 from launch_ros.actions import Node
-from launch_ros.descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -187,21 +185,32 @@ def generate_launch_description():
 
     # Get package directories
     pkg_eddie_gazebo = get_package_share_directory("eddie_gazebo")
-    pkg_eddie_description = get_package_share_directory("eddie_description")
+    pkg_eddie_share_description = get_package_share_directory("eddie_description")
+    pkg_robotiq_share_description = get_package_share_directory("robotiq_description")
 
     # Resource paths to be added to the GZ_SIM_RESOURCE_PATH environment variable
     resource_paths = [
-        pkg_eddie_description,
-        os.path.join(pkg_eddie_description, "meshes"),
+        os.path.join(pkg_eddie_share_description, ".."),
+        os.path.join(pkg_robotiq_share_description, ".."),
     ]
-    resource_paths_str = os.pathsep.join(resource_paths)
-    print("#############################################################", resource_paths_str)
-    print("resource_paths_str: ", resource_paths_str)
-    # Set the environment variable GZ_SIM_RESOURCE_PATH to include the resource paths
-    set_env_vars_resources = AppendEnvironmentVariable(
-        name="GZ_SIM_RESOURCE_PATH",
-        value=resource_paths_str,
-    )
+    resource_paths_str = ":".join(resource_paths)
+
+    gz_reource_env_var = "GZ_SIM_RESOURCE_PATH"
+
+    # check if the environment variable is already set
+    if gz_reource_env_var in os.environ:
+        resource_paths_str = os.environ[gz_reource_env_var] + ":" + resource_paths_str
+
+        # append the new path to the existing path
+        set_env_vars_resources = AppendEnvironmentVariable(
+            name=gz_reource_env_var, value=resource_paths_str
+        )
+
+    else:
+        # set the new path
+        set_env_vars_resources = SetEnvironmentVariable(
+            name=gz_reource_env_var, value=resource_paths_str
+        )
 
     # World and robot files
     world_file = os.path.join(pkg_eddie_gazebo, "worlds", "my_world.sdf")
@@ -273,7 +282,7 @@ def generate_launch_description():
                         )
                     ]
                 ),
-                launch_arguments=[("gz_args", [f" -r -v 1 {world_file}"])],
+                launch_arguments=[("gz_args", [f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"])],
             ),
             RegisterEventHandler(
                 event_handler=OnProcessExit(
