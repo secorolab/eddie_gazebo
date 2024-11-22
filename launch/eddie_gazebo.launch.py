@@ -6,7 +6,6 @@ from launch.actions import (
     AppendEnvironmentVariable,
     SetEnvironmentVariable,
     DeclareLaunchArgument,
-    ExecuteProcess,
     IncludeLaunchDescription,
     OpaqueFunction,
     RegisterEventHandler,
@@ -21,6 +20,7 @@ from launch.substitutions import (
 )
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch.conditions import IfCondition
 
 
 # Function to select and load the appropriate controllers based on the given context and launch arguments
@@ -153,7 +153,8 @@ def select_controller(context, *args, **kwargs):
         # Return the selected base and arm controllers for execution
         return [
             base_controller_map[declared_base_controller]
-         , *arm_controller_map[declared_arm_controller]]
+         , *arm_controller_map[declared_arm_controller]
+        ]
 
 
 def generate_launch_description():
@@ -168,6 +169,9 @@ def generate_launch_description():
     """
     # Configuration to use simulation time (use by default)
     use_sim_time = LaunchConfiguration("use_sim_time", default=True)
+
+    # enable rviz
+    use_rviz = LaunchConfiguration("use_rviz", default=False)
 
     # Declare the base controller argument with a default value of "velocity"
     declare_base_controller_type = DeclareLaunchArgument(
@@ -266,7 +270,7 @@ def generate_launch_description():
             "-topic",
             "robot_description",
             "-name",
-            "robot",
+            "eddie",
             "-allow_renaming",
             "true",
         ],
@@ -278,7 +282,21 @@ def generate_launch_description():
         name="rviz2",
         arguments=['-d', eddie_rviz_config_file],
         output="screen",
-    )    
+        condition=IfCondition(use_rviz),
+    )
+
+    # gazebo launch description
+    gz_launch_description = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py")
+        ),
+        launch_arguments=[
+            {
+                # "gz_args": f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"
+                "gz_args": f" -r -v 1 {world_file}"
+            }
+        ]
+    )
 
     return LaunchDescription(
         [
@@ -286,27 +304,7 @@ def generate_launch_description():
             declare_base_controller_type,
             declare_arm_controller_type,
             rviz2_node,
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    [
-                        PathJoinSubstitution(
-                            [
-                                FindPackageShare("ros_gz_sim"),
-                                "launch",
-                                "gz_sim.launch.py",
-                            ]
-                        )
-                    ]
-                ),
-                launch_arguments=[
-                    (
-                        "gz_args",
-                        [
-                            f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"
-                        ],
-                    )
-                ],
-            ),
+            gz_launch_description,
             RegisterEventHandler(
                 event_handler=OnProcessExit(
                     target_action=gz_spawn_entity,
