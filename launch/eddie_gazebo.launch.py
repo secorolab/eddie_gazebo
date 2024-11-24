@@ -13,8 +13,6 @@ from launch.actions import (
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
-    Command,
-    FindExecutable,
     LaunchConfiguration,
     PathJoinSubstitution,
 )
@@ -287,7 +285,11 @@ def generate_launch_description():
     # gazebo launch description
     gz_launch_description = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [PathJoinSubstitution([FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])]
+            [
+                PathJoinSubstitution(
+                    [FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"]
+                )
+            ]
         ),
         launch_arguments={
             # "gz_args": f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"
