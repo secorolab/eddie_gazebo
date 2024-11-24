@@ -117,14 +117,14 @@ arm_left_effort_controller:
 base_position_controller:
   ros__parameters:
     joints:
-      - eddie_front_left_drive_left_wheel_joint
-      - eddie_front_left_drive_right_wheel_joint
-      - eddie_front_right_drive_left_wheel_joint
-      - eddie_front_right_drive_right_wheel_joint
-      - eddie_rear_right_drive_left_wheel_joint
-      - eddie_rear_right_drive_right_wheel_joint
-      - eddie_rear_left_drive_left_wheel_joint
-      - eddie_rear_left_drive_right_wheel_joint
+      - eddie_front_left_drive_l_wheel_joint
+      - eddie_front_left_drive_r_wheel_joint
+      - eddie_front_right_drive_l_wheel_joint
+      - eddie_front_right_drive_r_wheel_joint
+      - eddie_rear_right_drive_l_wheel_joint
+      - eddie_rear_right_drive_r_wheel_joint
+      - eddie_rear_left_drive_l_wheel_joint
+      - eddie_rear_left_drive_r_wheel_joint
     # command_interfaces:
     #   - position
     # state_interfaces:
@@ -140,14 +140,14 @@ base_position_controller:
 base_velocity_controller:
   ros__parameters:
     joints:
-      - eddie_front_left_drive_left_wheel_joint
-      - eddie_front_left_drive_right_wheel_joint
-      - eddie_front_right_drive_left_wheel_joint
-      - eddie_front_right_drive_right_wheel_joint
-      - eddie_rear_right_drive_left_wheel_joint
-      - eddie_rear_right_drive_right_wheel_joint
-      - eddie_rear_left_drive_left_wheel_joint
-      - eddie_rear_left_drive_right_wheel_joint
+      - eddie_front_left_drive_l_wheel_joint
+      - eddie_front_left_drive_r_wheel_joint
+      - eddie_front_right_drive_l_wheel_joint
+      - eddie_front_right_drive_r_wheel_joint
+      - eddie_rear_right_drive_l_wheel_joint
+      - eddie_rear_right_drive_r_wheel_joint
+      - eddie_rear_left_drive_l_wheel_joint
+      - eddie_rear_left_drive_r_wheel_joint
     # command_interfaces:
     #   - velocity
     # state_interfaces:
@@ -163,14 +163,14 @@ base_velocity_controller:
 base_effort_controller:
   ros__parameters:
     joints:
-      - eddie_front_left_drive_left_wheel_joint
-      - eddie_front_left_drive_right_wheel_joint
-      - eddie_front_right_drive_left_wheel_joint
-      - eddie_front_right_drive_right_wheel_joint
-      - eddie_rear_right_drive_left_wheel_joint
-      - eddie_rear_right_drive_right_wheel_joint
-      - eddie_rear_left_drive_left_wheel_joint
-      - eddie_rear_left_drive_right_wheel_joint
+      - eddie_front_left_drive_l_wheel_joint
+      - eddie_front_left_drive_r_wheel_joint
+      - eddie_front_right_drive_l_wheel_joint
+      - eddie_front_right_drive_r_wheel_joint
+      - eddie_rear_right_drive_l_wheel_joint
+      - eddie_rear_right_drive_r_wheel_joint
+      - eddie_rear_left_drive_l_wheel_joint
+      - eddie_rear_left_drive_r_wheel_joint
     # command_interfaces:
     #   - effort
     # state_interfaces:
@@ -182,15 +182,3 @@ base_effort_controller:
     # constraints:
     #   stopped_velocity_tolerance: 0.0
     #   goal_time: 0.0
-
-base_wheel_unit_pivot_state:
-  ros__parameters:
-    joints:
-      - eddie_front_left_drive_struct_joint
-      - eddie_front_right_drive_struct_joint
-      - eddie_rear_left_drive_struct_joint
-      - eddie_rear_right_drive_struct_joint
-    # state_interfaces:
-    #   - position
-    #   - velocity
-    # state_publish_rate: 100.0

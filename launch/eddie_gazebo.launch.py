@@ -152,8 +152,8 @@ def select_controller(context, *args, **kwargs):
     else:
         # Return the selected base and arm controllers for execution
         return [
-            base_controller_map[declared_base_controller]
-         , *arm_controller_map[declared_arm_controller]
+            base_controller_map[declared_base_controller],
+            *arm_controller_map[declared_arm_controller],
         ]
 
 
@@ -184,7 +184,7 @@ def generate_launch_description():
     eddie_rviz_config_file = os.path.join(
         get_package_share_directory("eddie_description"), "config/rviz", "eddie.rviz"
     )
-    
+
     # Declare the arm controller argument with a default value of "joint_trajectory"
     declare_arm_controller_type = DeclareLaunchArgument(
         "arm_controller",
@@ -222,21 +222,7 @@ def generate_launch_description():
         )
 
     # World and robot files
-    world_file = os.path.join(pkg_eddie_gazebo, "worlds", "my_world.sdf")
-
-    robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("eddie_description"),
-                    "urdf",
-                    "eddie_robot.urdf.xacro",
-                ]
-            ),
-        ]
-    )
+    world_file = os.path.join(pkg_eddie_gazebo, "worlds", "eddie_basic_world.sdf")
 
     load_joint_state_broadcaster = Node(
         package="controller_manager",
@@ -251,14 +237,21 @@ def generate_launch_description():
         output="screen",
     )
 
-    # Parameters for the robot state publisher
-    robot_description_params = {"robot_description": robot_description_content}
-
-    # Robot state publisher
-    node_robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        parameters=[robot_description_params, {"use_sim_time": True}],
+    # load eddie
+    load_eddie_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                os.path.join(
+                    get_package_share_directory("eddie_description"),
+                    "launch",
+                    "load_eddie.launch.py",
+                )
+            ]
+        ),
+        launch_arguments={
+            "use_ros2_control": "true",
+            "use_gz_sim": "true",
+        }.items(),
     )
 
     # Spawn entity
@@ -273,14 +266,20 @@ def generate_launch_description():
             "eddie",
             "-allow_renaming",
             "true",
+            "-x",
+            "0",
+            "-y",
+            "0",
+            "-z",
+            "0.01",
         ],
     )
-    
+
     rviz2_node = Node(
         package="rviz2",
         executable="rviz2",
         name="rviz2",
-        arguments=['-d', eddie_rviz_config_file],
+        arguments=["-d", eddie_rviz_config_file],
         output="screen",
         condition=IfCondition(use_rviz),
     )
@@ -288,14 +287,12 @@ def generate_launch_description():
     # gazebo launch description
     gz_launch_description = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py")
+            [PathJoinSubstitution([FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])]
         ),
-        launch_arguments=[
-            {
-                # "gz_args": f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"
-                "gz_args": f" -r -v 1 {world_file}"
-            }
-        ]
+        launch_arguments={
+            # "gz_args": f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"
+            "gz_args": f" -r -v 1 {world_file}"
+        }.items(),
     )
 
     return LaunchDescription(
@@ -317,7 +314,7 @@ def generate_launch_description():
                     on_exit=[OpaqueFunction(function=select_controller)],
                 )
             ),
-            node_robot_state_publisher,
+            load_eddie_launch,
             gz_spawn_entity,
             DeclareLaunchArgument(
                 "use_sim_time",
