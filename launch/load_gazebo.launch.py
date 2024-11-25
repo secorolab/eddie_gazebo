@@ -5,6 +5,7 @@ from launch.actions import (
     AppendEnvironmentVariable,
     SetEnvironmentVariable,
     IncludeLaunchDescription,
+    DeclareLaunchArgument,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
@@ -35,6 +36,20 @@ def generate_launch_description():
         get_package_share_directory("eddie_description"), "config/rviz", "eddie.rviz"
     )
 
+    use_kelo_tulip_arg = DeclareLaunchArgument(
+        "use_kelo_tulip",
+        default_value="false",
+        description="Use kelo_tulip to control platform"
+    )
+    
+    use_kelo_tulip = LaunchConfiguration("use_kelo_tulip")
+
+    gz_bridge_config_path = os.path.join(
+        get_package_share_directory("eddie_gazebo"),
+        'config',
+        'gz_ros_bridge.yaml'
+    )
+    
     # Get package directories
     pkg_eddie_gazebo = get_package_share_directory("eddie_gazebo")
     pkg_eddie_share_description = get_package_share_directory("eddie_description")
@@ -81,6 +96,7 @@ def generate_launch_description():
         launch_arguments={
             "use_ros2_control": "true",
             "use_gz_sim": "true",
+            "use_kelo_tulip": use_kelo_tulip,
             "use_sim_time": use_sim_time,
         }.items(),
     )
@@ -130,12 +146,24 @@ def generate_launch_description():
         }.items(),
     )
 
+    bridge_gz_ros_node = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=[
+            '--ros-args', '-p',
+            f'config_file:={gz_bridge_config_path}'
+        ],
+        output='screen'
+    )
+    
     return LaunchDescription(
         [
+            use_kelo_tulip_arg,
             set_env_vars_resources,
             rviz2_node,
             gz_launch_description,
             load_eddie_launch,
             gz_spawn_entity,
+            bridge_gz_ros_node,
         ]
     )
