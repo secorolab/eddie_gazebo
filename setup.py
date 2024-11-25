@@ -4,6 +4,17 @@ import glob
 
 package_name = "eddie_gazebo"
 
+
+def get_all_files(directory):
+    paths = []
+    for root, _, files in os.walk(directory):
+        for file in files:
+            paths.append(
+                (os.path.join("share", package_name, root), [os.path.join(root, file)])
+            )
+    return paths
+
+
 setup(
     name=package_name,
     version="0.0.1",
@@ -19,6 +30,7 @@ setup(
             os.path.join("share", package_name, "worlds"),
             glob.glob(os.path.join("worlds", "*.sdf")),
         ),
+        *get_all_files("meshes"),
         (
             os.path.join("share", package_name, "config"),
             glob.glob(os.path.join("config", "*.yaml")),

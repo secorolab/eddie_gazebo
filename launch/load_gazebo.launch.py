@@ -57,6 +57,7 @@ def generate_launch_description():
 
     # Resource paths to be added to the GZ_SIM_RESOURCE_PATH environment variable
     resource_paths = [
+        os.path.join(pkg_eddie_gazebo, ".."),
         os.path.join(pkg_eddie_share_description, ".."),
         os.path.join(pkg_robotiq_share_description, ".."),
     ]
