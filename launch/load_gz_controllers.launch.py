@@ -31,6 +31,8 @@ def select_controller(context, *args, **kwargs):
     declared_base_controller = LaunchConfiguration("base_controller").perform(context)
     declared_arm_controller = LaunchConfiguration("arm_controller").perform(context)
 
+    use_kelo_tulip = LaunchConfiguration("use_kelo_tulip").perform(context)
+
     # Load and activate the arm effort controllers
     load_arm_left_effort_controller = Node(
         package="controller_manager",
@@ -139,10 +141,12 @@ def select_controller(context, *args, **kwargs):
         raise ValueError(f"Undefined arm_controller: {declared_arm_controller}")
     else:
         # Return the selected base and arm controllers for execution
-        return [
-            base_controller_map[declared_base_controller],
-            *arm_controller_map[declared_arm_controller],
-        ]
+        return (
+            [*arm_controller_map[declared_arm_controller]]
+            + [base_controller_map[declared_base_controller]]
+            if use_kelo_tulip == "true"
+            else []
+        )
 
 
 def generate_launch_description():
@@ -169,6 +173,12 @@ def generate_launch_description():
         description="Specify controller for arm (joint_trajectory, effort) (default: joint_trajectory)",
     )
 
+    use_kelo_tulip_arg = DeclareLaunchArgument(
+        "use_kelo_tulip",
+        default_value="false",
+        description="Use kelo_tulip to control platform",
+    )
+
     load_joint_state_broadcaster = Node(
         package="controller_manager",
         executable="spawner",
@@ -184,6 +194,7 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
+            use_kelo_tulip_arg,
             declare_base_controller_type,
             declare_arm_controller_type,
             load_joint_state_broadcaster,

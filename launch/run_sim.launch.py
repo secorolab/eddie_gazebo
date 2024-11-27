@@ -49,14 +49,11 @@ def generate_launch_description():
                     "launch",
                     "load_gz_controllers.launch.py",
                 )
-            ]
-        )
+            ],
+        ),
+        launch_arguments={"use_kelo_tulip": use_kelo_tulip}.items(),
     )
 
     return LaunchDescription(
-        [
-            use_kelo_tulip_arg,
-            load_eddie_gazebo_launch,
-            load_gz_controllers_launch
-        ]
+        [use_kelo_tulip_arg, load_eddie_gazebo_launch, load_gz_controllers_launch]
     )
