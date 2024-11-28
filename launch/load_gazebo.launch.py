@@ -1,55 +1,32 @@
 import os
 from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
 from launch.actions import (
     AppendEnvironmentVariable,
     SetEnvironmentVariable,
-    IncludeLaunchDescription,
-    DeclareLaunchArgument,
 )
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import (
-    LaunchConfiguration,
-    PathJoinSubstitution,
-)
-from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
-from launch.conditions import IfCondition
+from simple_launch import SimpleLauncher
 
 
 def generate_launch_description():
-    """Generates the launch description for the Eddie robot gazebo simulation.
+    sl = SimpleLauncher(use_sim_time=True)
 
-    This function sets up the environment variables, launches the Gazebo simulation.
-
-    Returns:
-        LaunchDescription: The launch description for the Eddie robot simulation.
-    """
-    # Configuration to use simulation time (use by default)
-    use_sim_time = LaunchConfiguration("use_sim_time", default=True)
-
-    # enable rviz
-    use_rviz = LaunchConfiguration("use_rviz", default=False)
-
-    # Declare path of rviz configuration file
-    eddie_rviz_config_file = os.path.join(
-        get_package_share_directory("eddie_description"), "config/rviz", "eddie.rviz"
+    sl.declare_arg("use_rviz", default_value="false", description="Use RViz")
+    sl.declare_arg(
+        "use_floorplan_model", default_value="True", description="Use floorplan model"
     )
-
-    use_kelo_tulip_arg = DeclareLaunchArgument(
+    sl.declare_arg(
+        "floorplan_model_name",
+        default_value="brsu_building_c_level_2",
+        description="Name of the floorplan model",
+    )
+    sl.declare_arg(
         "use_kelo_tulip",
         default_value="false",
-        description="Use kelo_tulip to control platform"
+        description="Use kelo_tulip to control platform",
     )
-    
-    use_kelo_tulip = LaunchConfiguration("use_kelo_tulip")
 
-    gz_bridge_config_path = os.path.join(
-        get_package_share_directory("eddie_gazebo"),
-        'config',
-        'gz_ros_bridge.yaml'
-    )
-    
+    gz_bridge_config_path = sl.find("eddie_gazebo", "gz_ros_bridge.yaml", "config")
+
     # Get package directories
     pkg_eddie_gazebo = get_package_share_directory("eddie_gazebo")
     pkg_eddie_share_description = get_package_share_directory("eddie_description")
@@ -80,91 +57,55 @@ def generate_launch_description():
             name=gz_reource_env_var, value=resource_paths_str
         )
 
+    sl.add_action(set_env_vars_resources)
+
     # World and robot files
-    world_file = os.path.join(pkg_eddie_gazebo, "worlds", "eddie_basic_world.sdf")
+    world_file = sl.find("eddie_gazebo", "eddie_basic_world.sdf", "worlds")
 
-    # load eddie
-    load_eddie_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [
-                os.path.join(
-                    get_package_share_directory("eddie_description"),
-                    "launch",
-                    "load_eddie.launch.py",
-                )
-            ]
-        ),
-        launch_arguments={
-            "use_ros2_control": "true",
-            "use_gz_sim": "true",
-            "use_kelo_tulip": use_kelo_tulip,
-            "use_sim_time": use_sim_time,
-        }.items(),
+    # Load eddie_description
+    eddie_description_args = {
+        "use_kelo_tulip": sl.arg("use_kelo_tulip"),
+        "use_sim_time": "true",
+        "use_ros2_control": "true",
+        "use_gz_sim": "true",
+    }
+    sl.include(
+        "eddie_description",
+        "load_eddie.launch.py",
+        launch_arguments=eddie_description_args,
     )
 
-    # Spawn entity
-    gz_spawn_entity = Node(
-        package="ros_gz_sim",
-        executable="create",
-        output="screen",
-        arguments=[
-            "-topic",
-            "robot_description",
-            "-name",
-            "eddie",
-            "-allow_renaming",
-            "true",
-            "-x",
-            "0",
-            "-y",
-            "0",
-            "-z",
-            "0.01",
-        ],
+    # launch gz sim
+    sl.gz_launch(world_file, gz_args=" -r -v 1")
+
+    # Spawn eddie model
+    sl.spawn_gz_model(
+        "eddie",
+        "robot_description",
+        spawn_args=["x", "0", "y", "0", "z", "0.01", "allow_renaming", "true"],
     )
 
-    rviz2_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        arguments=["-d", eddie_rviz_config_file],
-        output="screen",
-        condition=IfCondition(use_rviz),
+    # Launch gz bridge
+    sl.node(
+        "ros_gz_bridge",
+        "parameter_bridge",
+        arguments=["--ros-args", "-p", f"config_file:={gz_bridge_config_path}"],
     )
 
-    # gazebo launch description
-    gz_launch_description = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [
-                PathJoinSubstitution(
-                    [FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"]
-                )
-            ]
-        ),
-        launch_arguments={
-            # "gz_args": f" -r -v 1 --physics-engine gz-physics-bullet-featherstone-plugin {world_file}"
-            "gz_args": f" -r -v 1 {world_file}"
-        }.items(),
-    )
+    # spawn floorplan model
+    with sl.group(if_arg="use_floorplan_model"):
+        model_sdf = sl.find(
+            "eddie_gazebo",
+            sl.arg("floorplan_model_name") + ".sdf",
+            "meshes/floorplan-gen/" + sl.arg("floorplan_model_name"),
+        )
+        sl.spawn_gz_model(
+            "floorplan_model",
+            model_file=model_sdf,
+            spawn_args=["x", "0", "y", "0", "z", "0", "allow_renaming", "true"],
+        )
 
-    bridge_gz_ros_node = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        arguments=[
-            '--ros-args', '-p',
-            f'config_file:={gz_bridge_config_path}'
-        ],
-        output='screen'
-    )
-    
-    return LaunchDescription(
-        [
-            use_kelo_tulip_arg,
-            set_env_vars_resources,
-            rviz2_node,
-            gz_launch_description,
-            load_eddie_launch,
-            gz_spawn_entity,
-            bridge_gz_ros_node,
-        ]
-    )
+    with sl.group(if_arg="use_rviz"):
+        sl.rviz(sl.find("eddie_description", "eddie.rvviz", "config/rviz"))
+
+    return sl.launch_description()

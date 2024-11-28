@@ -11,7 +11,7 @@ robot.
 - **Gazebo Version**: Harmonic
 
   ```bash
-  sudo apt-get install ros-jazzy-ros-gz
+  sudo apt-get install ros-jazzy-ros-gz ros-jazzy-simple-launch
   ```
 
   - Ensure that the environment variable `GZ_VERSION` is set to `harmonic` when building the

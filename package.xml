@@ -17,6 +17,7 @@
   <depend>ros_gz_bridge</depend>
   <depend>ros_gz_image</depend>
   <depend>gz_ros2_control</depend>
+  <depend>simple_launch</depend>
 
   <export>
     <build_type>ament_python</build_type>

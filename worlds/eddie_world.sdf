@@ -50,7 +50,7 @@
 					<geometry>
 						<plane>
 							<normal>0 0 1</normal>
-							<size>1000 1000</size>
+							<size>1000 100</size>
 						</plane>
 					</geometry>
 					<surface>
@@ -65,7 +65,7 @@
 					<geometry>
 						<plane>
 							<normal>0 0 1</normal>
-							<size>1000 1000</size>
+							<size>100 100</size>
 						</plane>
 					</geometry>
 					<material>
@@ -74,6 +74,62 @@
 						<specular>0.8 0.8 0.8 1</specular>
 					</material>
 				</visual>
+			</link>
+		</model>
+
+		<model name="carpet">
+			<pose>0 0 0.01 0 0 0</pose>
+			<link name="carpet_link">
+				<inertial>
+					<mass>0.5</mass>
+					<inertia>
+						<ixx>0.0</ixx>
+						<iyy>0.0</iyy>
+						<izz>0.0</izz>
+					</inertia>
+				</inertial>
+				<visual name="carpet_visual">
+					<geometry>
+						<box>
+							<size>5 10 0.01</size>
+						</box>
+					</geometry>
+					<material>
+						<!-- texture -->
+						<pbr>
+							<metal>
+								<albedo_map>file://eddie_gazebo/meshes/textures/lab_tiles.png</albedo_map>
+							</metal>
+						</pbr>
+						<!-- properties -->
+						<ambient>0.8 0.8 0.8 1</ambient>
+						<diffuse>0.8 0.8 0.8 1</diffuse>
+						<specular>0.8 0.8 0.8 1</specular>
+					</material>
+				</visual>
+				<collision name="carpet_collision">
+					<geometry>
+						<box>
+							<size>5 10 0.01</size>
+						</box>
+					</geometry>
+					<surface>
+						<friction>
+							<ode>
+								<!-- Friction coefficients -->
+								<mu>0.6</mu> <!-- Coefficient of friction (static) -->
+								<mu2>0.6</mu2> <!-- Coefficient of friction (dynamic) -->
+							</ode>
+						</friction>
+						<bounce>
+							<restitution_coefficient>0.1</restitution_coefficient>
+						</bounce>
+						<contact>
+							<collide_without_contact>false</collide_without_contact>
+							<!-- <max_contacts>10</max_contacts> -->
+						</contact>
+					</surface>
+				</collision>
 			</link>
 		</model>
 
