@@ -93,17 +93,23 @@ def generate_launch_description():
     )
 
     # spawn floorplan model
-    with sl.group(if_arg="use_floorplan_model"):
-        model_sdf = sl.find(
-            "eddie_gazebo",
-            sl.arg("floorplan_model_name") + ".sdf",
-            "meshes/floorplan-gen/" + sl.arg("floorplan_model_name"),
-        )
-        sl.spawn_gz_model(
-            "floorplan_model",
-            model_file=model_sdf,
-            spawn_args=["x", "0", "y", "0", "z", "0", "allow_renaming", "true"],
-        )
+    # with sl.group(if_arg="use_floorplan_model"):
+    #     model_sdf = sl.find(
+    #         "eddie_gazebo",
+    #         sl.arg("floorplan_model_name") + ".sdf",
+    #         "meshes/floorplan-gen/" + sl.arg("floorplan_model_name"),
+    #     )
+    #     sl.spawn_gz_model(
+    #         "floorplan_model",
+    #         model_file=model_sdf,
+    #         spawn_args=["x", "0", "y", "0", "z", "0", "allow_renaming", "true"],
+    #     )
+
+    sl.spawn_gz_model(
+        "simple_world",
+        model_file=sl.find("eddie_gazebo", "simple_world.sdf", "meshes"),
+        spawn_args=["x", "0", "y", "0", "z", "0.0", "allow_renaming", "true"],
+    )
 
     with sl.group(if_arg="use_rviz"):
         sl.rviz(sl.find("eddie_description", "eddie.rvviz", "config/rviz"))

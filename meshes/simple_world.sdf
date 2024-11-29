@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="simple_world">
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>
+              file://eddie_gazebo/meshes/simple_world.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>
+              file://eddie_gazebo/meshes/simple_world.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <static>1</static>
+  </model>
+</sdf>
