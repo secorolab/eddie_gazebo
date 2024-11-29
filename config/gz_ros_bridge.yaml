@@ -1,5 +1,3 @@
-# Full set of configurations
-
 - ros_topic_name: "/clock"
   gz_topic_name: "/world/eddie_world/clock"
   ros_type_name: "rosgraph_msgs/msg/Clock"
@@ -20,8 +18,20 @@
   ros_type_name: "sensor_msgs/msg/Imu"
   gz_type_name: "gz.msgs.IMU"
   direction: GZ_TO_ROS
+# Laser scan topics
 - ros_topic_name: "scan"
   gz_topic_name: "/eddie_front_right_laser"
   ros_type_name: "sensor_msgs/msg/LaserScan"
   gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+# - ros_topic_name: "scan"
+#   gz_topic_name: "/eddie_rear_left_laser"
+#   ros_type_name: "sensor_msgs/msg/LaserScan"
+#   gz_type_name: "gz.msgs.LaserScan"
+#   direction: GZ_TO_ROS
+# odom to base_footprint transform
+- ros_topic_name: "/tf"
+  gz_topic_name: "/model/eddie/pose"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "gz.msgs.Pose_V"
   direction: GZ_TO_ROS
