@@ -45,8 +45,8 @@
 
 		<model name="ground_plane">
 			<static>true</static>
-			<link name="link">
-				<collision name="collision">
+			<link name="ground_plane_link">
+				<collision name="ground_plane_link_collision">
 					<geometry>
 						<plane>
 							<normal>0 0 1</normal>
@@ -56,12 +56,12 @@
 					<surface>
 						<friction>
 							<ode>
-								<mu>1</mu>
+								<mu>0.6</mu>
 							</ode>
 						</friction>
 					</surface>
 				</collision>
-				<visual name="visual">
+				<visual name="ground_plane_link_visual">
 					<geometry>
 						<plane>
 							<normal>0 0 1</normal>

@@ -82,7 +82,7 @@ def generate_launch_description():
     sl.spawn_gz_model(
         "eddie",
         "robot_description",
-        spawn_args=["x", "0", "y", "0", "z", "0.01", "allow_renaming", "true"],
+        spawn_args=["x", "0", "y", "0", "z", "0", "allow_renaming", "true"],
     )
 
     # Launch gz bridge
