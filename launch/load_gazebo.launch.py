@@ -40,21 +40,21 @@ def generate_launch_description():
     ]
     resource_paths_str = ":".join(resource_paths)
 
-    gz_reource_env_var = "GZ_SIM_RESOURCE_PATH"
+    gz_resource_env_var = "GZ_SIM_RESOURCE_PATH"
 
     # check if the environment variable is already set
-    if gz_reource_env_var in os.environ:
-        resource_paths_str = os.environ[gz_reource_env_var] + ":" + resource_paths_str
+    if gz_resource_env_var in os.environ:
+        resource_paths_str = os.environ[gz_resource_env_var] + ":" + resource_paths_str
 
         # append the new path to the existing path
         set_env_vars_resources = AppendEnvironmentVariable(
-            name=gz_reource_env_var, value=resource_paths_str
+            name=gz_resource_env_var, value=resource_paths_str
         )
 
     else:
         # set the new path
         set_env_vars_resources = SetEnvironmentVariable(
-            name=gz_reource_env_var, value=resource_paths_str
+            name=gz_resource_env_var, value=resource_paths_str
         )
 
     sl.add_action(set_env_vars_resources)

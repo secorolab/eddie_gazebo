@@ -44,6 +44,7 @@ def select_controller(context, *args, **kwargs):
             "--controller-manager-timeout",
             "30",
         ],
+        parameters=[{"use_sim_time": True}],
     )
 
     load_arm_right_effort_controller = Node(
@@ -56,6 +57,7 @@ def select_controller(context, *args, **kwargs):
             "--controller-manager-timeout",
             "30",
         ],
+        parameters=[{"use_sim_time": True}],
     )
 
     # Load and activate the arm joint trajectory controllers
@@ -69,6 +71,7 @@ def select_controller(context, *args, **kwargs):
             "--controller-manager-timeout",
             "30",
         ],
+        parameters=[{"use_sim_time": True}],
     )
     load_joint_trajectory_controller_right = Node(
         package="controller_manager",
@@ -80,6 +83,7 @@ def select_controller(context, *args, **kwargs):
             "--controller-manager-timeout",
             "30",
         ],
+        parameters=[{"use_sim_time": True}],
     )
 
     # Load and activate the base controllers
@@ -93,6 +97,7 @@ def select_controller(context, *args, **kwargs):
             "--controller-manager-timeout",
             "30",
         ],
+        parameters=[{"use_sim_time": True}],
     )
 
     load_joint_velocity_controller = Node(
@@ -105,6 +110,7 @@ def select_controller(context, *args, **kwargs):
             "--controller-manager-timeout",
             "30",
         ],
+        parameters=[{"use_sim_time": True}],
     )
 
     load_joint_effort_controller = Node(
@@ -117,6 +123,7 @@ def select_controller(context, *args, **kwargs):
             "--controller-manager-timeout",
             "30",
         ],
+        parameters=[{"use_sim_time": True}],
     )
 
     # Define a dictionary to map the declared base controller type to its corresponding controllers
@@ -189,6 +196,7 @@ def generate_launch_description():
             "--controller-manager-timeout",
             "30",
         ],
+        parameters=[{"use_sim_time": True}],
         output="screen",
     )
 
