@@ -114,4 +114,13 @@ def generate_launch_description():
     with sl.group(if_arg="use_rviz"):
         sl.rviz(sl.find("eddie_description", "eddie.rvviz", "config/rviz"))
 
+    with sl.group(if_arg="use_kelo_tulip"):
+        sl.node(
+            "kelo_tulip",
+            "kelo_gazebo_platform_controller",
+            arguments=[
+                "use_sim_time:=true",
+            ],
+        )
+
     return sl.launch_description()
