@@ -120,7 +120,9 @@ def generate_launch_description():
             "kelo_gazebo_platform_controller",
             arguments=[
                 "use_sim_time:=true",
+                # "__log_level:=debug",
             ],
+            output="screen",
         )
 
     return sl.launch_description()
