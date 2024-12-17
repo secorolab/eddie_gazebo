@@ -11,8 +11,6 @@ controller_manager:
       type: effort_controllers/JointGroupEffortController
     arm_left_effort_controller:
       type: effort_controllers/JointGroupEffortController
-    base_position_controller:
-      type: position_controllers/JointGroupPositionController
     base_velocity_controller:
       type: velocity_controllers/JointGroupVelocityController
     base_effort_controller:
@@ -101,28 +99,6 @@ arm_left_effort_controller:
     constraints:
       stopped_velocity_tolerance: 0.0
       goal_time: 0.0
-base_position_controller:
-  ros__parameters:
-    joints:
-      - eddie_front_left_drive_l_wheel_joint
-      - eddie_front_left_drive_r_wheel_joint
-      - eddie_rear_left_drive_l_wheel_joint
-      - eddie_rear_left_drive_r_wheel_joint
-      - eddie_rear_right_drive_l_wheel_joint
-      - eddie_rear_right_drive_r_wheel_joint
-      - eddie_front_right_drive_l_wheel_joint
-      - eddie_front_right_drive_r_wheel_joint
-      # command_interfaces:
-      #   - position
-      # state_interfaces:
-      #   - position
-      #   - velocity
-      # state_publish_rate: 100.0
-      # action_monitor_rate: 20.0
-      # allow_partial_joints_goal: false
-      # constraints:
-      #   stopped_velocity_tolerance: 0.0
-      #   goal_time: 0.0
 base_velocity_controller:
   ros__parameters:
     joints:
@@ -134,17 +110,6 @@ base_velocity_controller:
       - eddie_rear_right_drive_r_wheel_joint
       - eddie_front_right_drive_l_wheel_joint
       - eddie_front_right_drive_r_wheel_joint
-      # command_interfaces:
-      #   - velocity
-      # state_interfaces:
-      #   - position
-      #   - velocity
-      # state_publish_rate: 100.0
-      # action_monitor_rate: 20.0
-      # allow_partial_joints_goal: false
-      # constraints:
-      #   stopped_velocity_tolerance: 0.0
-      #   goal_time: 0.0
 base_effort_controller:
   ros__parameters:
     joints:
@@ -156,14 +121,3 @@ base_effort_controller:
       - eddie_rear_right_drive_r_wheel_joint
       - eddie_front_right_drive_l_wheel_joint
       - eddie_front_right_drive_r_wheel_joint
-    # command_interfaces:
-    #   - effort
-    # state_interfaces:
-    #   - position
-    #   - velocity
-    # state_publish_rate: 100.0
-    # action_monitor_rate: 20.0
-    # allow_partial_joints_goal: false
-    # constraints:
-    #   stopped_velocity_tolerance: 0.0
-    #   goal_time: 0.0

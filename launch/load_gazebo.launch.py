@@ -10,6 +10,8 @@ from simple_launch import SimpleLauncher
 def generate_launch_description():
     sl = SimpleLauncher(use_sim_time=True)
 
+    sl.declare_arg("use_sim_time", "true", description="Use simulation time")
+
     sl.declare_arg("use_rviz", default_value="false", description="Use RViz")
     sl.declare_arg(
         "use_floorplan_model", default_value="True", description="Use floorplan model"
@@ -65,7 +67,7 @@ def generate_launch_description():
     # Load eddie_description
     eddie_description_args = {
         "use_kelo_tulip": sl.arg("use_kelo_tulip"),
-        "use_sim_time": "true",
+        "use_sim_time": sl.arg("use_sim_time"),
         "use_ros2_control": "true",
         "use_gz_sim": "true",
     }
@@ -115,14 +117,10 @@ def generate_launch_description():
         sl.rviz(sl.find("eddie_description", "eddie.rvviz", "config/rviz"))
 
     with sl.group(if_arg="use_kelo_tulip"):
-        sl.node(
+        sl.include(
             "kelo_tulip",
-            "kelo_gazebo_platform_controller",
-            arguments=[
-                "use_sim_time:=true",
-                # "__log_level:=debug",
-            ],
-            output="screen",
+            "kelo_platform_controller_gz.launch.py",
+            launch_arguments={"use_sim_time": sl.arg("use_sim_time")},
         )
 
     return sl.launch_description()
