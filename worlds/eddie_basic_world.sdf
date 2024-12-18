@@ -1,6 +1,6 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <sdf version="1.6">
-	<world name="default">
+	<world name="eddie_world">
 		<physics name="1ms" type="ignored">
 			<max_step_size>0.001</max_step_size>
 			<real_time_factor>1.0</real_time_factor>
@@ -44,37 +44,42 @@
 		</light>
 
 		<model name="ground_plane">
-    	  	<static>true</static>
-    	  	<link name="link">
-    	  	  	<collision name="collision">
-    	  	  	  	<geometry>
-    	  	  	  	  	<plane>
-    	  	  	  	  	  	<normal>0 0 1</normal>
-    	  	  	  	  	  	<size>100 100</size>
-    	  	  	  	  	</plane>
-    	  	  	  	</geometry>
-    	  	  	  	<surface>
-    	  	  	  	  	<friction>
-    	  	  	  	  	  	<ode>
-    	  	  	  	  	  		<mu>1</mu>
-    	  	  	  	  	  	</ode>
-    	  	  	  	  	</friction>
-    	  	  	  	</surface>
-    	  	  	</collision>
-    	  	  	<visual name="visual">
-    	  	  	  	<geometry>
-    	  	  	  	  	<plane>
-    	  	  	  	  		<normal>0 0 1</normal>
-    	  	  	  	  		<size>100 100</size>
-    	  	  	  	  	</plane>
-    	  	  	  	</geometry>
-    	  	  	  	<material>
-    	  	  	  	  	<ambient>0.8 0.8 0.8 1</ambient>
-    	  	  	  	  	<diffuse>0.8 0.8 0.8 1</diffuse>
-    	  	  	  	  	<specular>0.8 0.8 0.8 1</specular>
-    	  	  	  	</material>
-    	  	  	</visual>
-    	  	</link>
-    	</model>
+			<static>true</static>
+			<link name="ground_plane_link">
+				<collision name="ground_plane_link_collision">
+					<geometry>
+						<plane>
+							<normal>0 0 1</normal>
+							<size>1000 1000</size>
+						</plane>
+					</geometry>
+					<surface>
+						<friction>
+							<ode>
+								<mu>0.75</mu>
+							</ode>
+						</friction>
+					</surface>
+				</collision>
+				<visual name="ground_plane_link_visual">
+					<geometry>
+						<plane>
+							<normal>0 0 1</normal>
+							<size>1000 1000</size>
+						</plane>
+					</geometry>
+					<material>
+						<ambient>0.8 0.8 0.8 1</ambient>
+						<diffuse>0.8 0.8 0.8 1</diffuse>
+						<specular>0.8 0.8 0.8 1</specular>
+					</material>
+				</visual>
+			</link>
+		</model>
+
+		<!-- Define scene properties -->
+		<scene>
+			<shadows>true</shadows>
+		</scene>
 	</world>
 </sdf>

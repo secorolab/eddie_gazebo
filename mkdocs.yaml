@@ -1,0 +1,90 @@
+site_name: Eddie gazebo documentation
+site_url: https://secorolab.github.io/eddie_gazebo/
+repo_url: https://github.com/secorolab/eddie_gazebo
+repo_name: secorolab/eddie_gazebo
+theme:
+  #  logo: assets/logo.png
+  icon:
+    repo: fontawesome/brands/github
+  name: material
+  palette:
+    # Palette toggle for automatic mode
+    - media: (prefers-color-scheme)
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+        # Palette toggle for light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+        # Palette toggle for dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - header.autohide
+    - toc.follow
+    - toc.integrate
+    - navigation.tracking
+    - navigation.instant.preview
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.select
+    - content.tooltips
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: pymdownx.superfences.fence_code_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.arithmatex:
+      generic: true
+  - tables
+  - toc:
+      permalink: true
+plugins:
+  - search
+  - awesome-pages
+extra_css:
+  - styles/extra.css
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/secorolab
+    - icon: material/web
+      link: https://www.uni-bremen.de/secoro
+      # extra_javascript: # Add MathJax support if required
+  # - javascripts/mathjax.js
+  # - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+copyright: Copyright &copy; 2024 SECORO Group
+use_directory_urls: false

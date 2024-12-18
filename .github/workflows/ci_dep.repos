@@ -1,0 +1,13 @@
+repositories:
+  ros2_kortex:
+    type: git
+    url: https://github.com/secorolab/ros2_kortex.git
+    version: main
+  ros2_robotiq_gripper:
+    type: git
+    url: https://github.com/PickNikRobotics/ros2_robotiq_gripper.git
+    version: main
+  eddie_description:
+    type: git
+    url: https://github.com/secorolab/eddie_description.git
+    version: main

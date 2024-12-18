@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="brsu_building_c_level_2">
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>
+              file://eddie_gazebo/meshes/floorplan-gen/brsu_building_c_level_2/brsu_building_c_level_2.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>
+              file://eddie_gazebo/meshes/floorplan-gen/brsu_building_c_level_2/brsu_building_c_level_2.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <static>1</static>
+  </model>
+</sdf>

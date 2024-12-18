@@ -11,7 +11,7 @@ robot.
 - **Gazebo Version**: Harmonic
 
   ```bash
-  sudo apt-get install ros-jazzy-ros-gz
+  sudo apt-get install ros-jazzy-ros-gz ros-jazzy-simple-launch
   ```
 
   - Ensure that the environment variable `GZ_VERSION` is set to `harmonic` when building the
@@ -110,7 +110,7 @@ sudo docker run -it --rm --runtime=nvidia --gpus all  \
 ### Launch the simulation
 
 ```bash
-ros2 launch eddie_gazebo eddie_gazebo.launch.py
+ros2 launch eddie_gazebo run_sim.launch.py
 ```
 
 - To move the base using `Teleop`, select the `Teleop` from the `Tools` menu in the Gazebo GUI.
@@ -120,13 +120,13 @@ ros2 launch eddie_gazebo eddie_gazebo.launch.py
 1. By default, the `base_controller` for controlling the mobile base is a velocity controller and
    the `arm_controller` for controlling the Kinova arms is a `trajectory_controller`. You can
    customize the base_controller and arm_controller by providing launch arguments, for example:
-
+<!--
     ```bash
     ros2 launch eddie_gazebo eddie_gazebo.launch.py arm_controller:=joint_trajectory base_controller:=position
     ```
 
     - Valid values for `arm_controller` are `joint_trajectory` and `effort`.
-    - Valid values for `base_controller` are `position`, `velocity`, and `effort`.
+    - Valid values for `base_controller` are `position`, `velocity`, and `effort`. -->
 
 2. The `joint_trajectory` controller can accept position as well as velocity commands.
 
@@ -198,13 +198,13 @@ ros2 run rqt_controller_manager rqt_controller_manager --force-discover
 ```
 
 In the UI, if controller_manager is not already selected, choose it from the dropdown menu. ![Select
-the namespace(controller_manager)](/doc/images/namespace.png)
+the namespace(controller_manager)](docs/images/namespace.png)
 
 To unload a controller, right-click on the desired controller and select "De-activate and Unload".
-![Unload the controller for left arm/right arm/base](/doc/images/unload.png)
+![Unload the controller for left arm/right arm/base](docs/images/unload.png)
 
 To load the desired controller, right-click on it and select 'Load, Configure and activate'. ![Load
-the controller for left arm/right arm/base](/doc/images/load.png)
+the controller for left arm/right arm/base](docs/images/load.png)
 
 ### Note
 
